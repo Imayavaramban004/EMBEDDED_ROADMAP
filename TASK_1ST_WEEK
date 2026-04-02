@@ -1,0 +1,65 @@
+FOLLOW 147 RULE:
+
+
+Day-1:
+	OFFICE:
+		1Hrs: Refer Notes for Pointer, Volatile, Bit Ops, Macros, Pipeline, Register, Modes, MSP/PSP
+		1Hrs: Theory for Circular_Buffer, FSM, LinkedList
+		1Hrs: Refer Notes for linker script, SRAM, Flash usage, CCM
+		1Hrs: Circular Buffer STEPS.
+	HOME:
+		1Hrs: Implement Circular Buffer.
+		2Hrs: Make UART Circular Buffer=> Industry standard.
+Day- 2:
+	OFFICE:
+		1Hrs: Learn ISR rules, Context save, Hardware Auto save concepts
+		1Hrs: CFSR, HFSR, BFAR, Systick Debounce, Flag
+		1Hrs: Take Notes for this topics.
+		1Hrs: Procedure for EXTI Interrupt + Debounce
+	HOME:
+		1Hrs: Implement the EXTI Interrupt
+		2Hrs: Make it Industry Standard
+Day- 3:
+	OFFICE:
+		1Hrs: Learn SysTick 24-bit Timer & 32 Bit timer and APB Prescalar Rule x2.
+		1Hrs: Edge vs Center-Aligned PWM, Input Capture. IWDG & WWDG
+		1Hrs: Take Notes for this topics
+		2Hrs: Procedure Generate an PWM Signal with brightness of Light
+	HOME:
+		1Hrs: Implement the PWM Generation for LED.
+		1Hrs: Make it Indusry standard.
+Day- 4:
+	OFFICE:
+		2Hrs: DMA Architecture.
+		1Hrs: Take Notes for DMA Architecture(HT/TC/Error Interrupts).
+		1Hrs: DMA Circular Mode, DMA Double Buffer.
+	HOME:
+		1Hrs: Take Notes on DMA Circular Mode, DMA Double Buffer.
+		2Hrs: See the Notes of Day- 1.
+Day- 5:
+	OFFICE:
+		1Hrs: DMA+ADC Scan.
+		1Hrs: Take complete Notes and revise DMA.
+		2Hrs: Steps for DMA + ADC Scan + UART DMA Transfer.
+	HOME:
+		1Hrs: Implement DMA+ADC Scan+ UART DMA Transfer.
+		2Hrs: Make it Industry Standard.
+Day- 6:
+	2Hrs- Revise Day- 2 Concepts.
+	2Hrs- Revise Day- 3 Concepts.
+	2Hrs- Revise Day- 4 Concepts.
+Day- 7:
+	2Hrs- Revise Day- 5 Concepts.
+	1Hrs- Flow for Sensor Logger.
+	2Hrs- Steps for Sensor Logger.
+	3Hrs- Build the Project.
+	
+	
+
+		
+
+		
+
+
+	
+	
