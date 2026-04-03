@@ -1,3 +1,0 @@
-"Hello Embedded World!"
-Hello world from Ubuntu
-
