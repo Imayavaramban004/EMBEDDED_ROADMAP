@@ -2,30 +2,31 @@ ENTRY(Reset_handler)
 
 MEMORY
 {
-	FLASH(rx):ORIGIN= 0x08000000, LENGTH= 512K
-	SRAM(rwx):ORIGIN= 0x20000000, LENGTH= 128K
-	BAKSRAM: ORIGIN= 0x40024000, LENGTH= 16K
+	FLASH(rx) : ORIGIN = 0x08000000, LENGTH = 512K
+	SRAM(rwx) : ORIGIN = 0x20000000, LENGTH = 128K
+	BAKSRAM(rwx) : ORIGIN = 0x40024000, LENGTH = 16K
 }
 SECTIONS
 {
-	.text:
+	.text :
 	{
 		*(.isr_vector)
 		*(.text)
 		*(.rodata)
-		_etext =.;
-	}>FLASH AT> FLASH
-	.data:
+		_etext = .;
+	} > FLASH AT >FLASH
+	.data :
 	{
-		_sdata= .;
+		_sdata = .;
 		*(.data)
-		_edata= .;
+		_edata = .;
 	}>SRAM AT> FLASH
-	.bss:
+	.bss :
 	{
-		_sbss= .;
+		_sbss = .;
 		*(.bss)
-		_ebss= .;
-	}
+		*(COMMON)
+		_ebss = .;
+	} > SRAM
 
 }

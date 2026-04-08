@@ -7,7 +7,7 @@
 
 #define STACK_START SRAM_END
 
-void Reset_handler(void) __attribute__((section(".Reset_Handler")));
+void Reset_handler(void);
 
 
 // ================= DEFAULT HANDLER =================
@@ -138,7 +138,7 @@ void SPDIF_RX_handler(void)           __attribute__((weak, alias("Default_handle
 void FMPI2C1_EV_handler(void)         __attribute__((weak, alias("Default_handler")));
 void FMPI2C1_ER_handler(void)         __attribute__((weak, alias("Default_handler")));
 
-uint32_t vector_table[] __attribute__((section(".VECTOR_TABLE"))) =
+uint32_t vector_table[] __attribute__((section(".isr_vector"))) =
 {
     STACK_START,
     (uint32_t)&Reset_handler,

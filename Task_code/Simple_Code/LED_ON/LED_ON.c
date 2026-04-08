@@ -34,6 +34,7 @@ int main(){
 	RCC_ENR();
 	GPIO_MODER_OUTPUT();
 	// GPIO_INIT();
+	int a=5;
 	LED_ON();
 	return 0;
 }
