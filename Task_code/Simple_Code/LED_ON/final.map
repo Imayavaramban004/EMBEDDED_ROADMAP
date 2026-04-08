@@ -1,0 +1,176 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00020000         xrw
+BAKSRAM          0x40024000         0x00004000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD LED_ON.o
+LOAD startup_LED_ON.o
+
+.text           0x08000000      0x256
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1c4 startup_LED_ON.o
+                0x08000000                vector_table
+ *(.text)
+ .text          0x080001c4       0x80 LED_ON.o
+                0x080001c4                GPIO_MODER_OUTPUT
+                0x080001ec                RCC_ENR
+                0x08000208                LED_ON
+                0x08000224                main
+ .text          0x08000244       0x12 startup_LED_ON.o
+                0x08000244                Reset_handler
+                0x08000250                DMA1_Stream7_handler
+                0x08000250                USART1_handler
+                0x08000250                TIM1_UP_TIM10_handler
+                0x08000250                OTG_HS_handler
+                0x08000250                EXTI0_handler
+                0x08000250                DMA1_Stream1_handler
+                0x08000250                TIM8_BRK_TIM12_handler
+                0x08000250                TIM6_DAC_handler
+                0x08000250                CAN1_RX1_handler
+                0x08000250                SDIO_handler
+                0x08000250                NMI_handler
+                0x08000250                DMA2_Stream3_handler
+                0x08000250                TIM8_TRG_COM_TIM14_handler
+                0x08000250                OTG_HS_WKUP_handler
+                0x08000250                TIM2_handler
+                0x08000250                USART2_handler
+                0x08000250                OTG_HS_EP1_IN_handler
+                0x08000250                FMPI2C1_EV_handler
+                0x08000250                SPI3_handler
+                0x08000250                TIM3_handler
+                0x08000250                SAI2_handler
+                0x08000250                WWDG_handler
+                0x08000250                RTC_Alarm_handler
+                0x08000250                SPI2_handler
+                0x08000250                DMA2_Stream6_handler
+                0x08000250                SAI1_handler
+                0x08000250                UART4_handler
+                0x08000250                TIM8_UP_TIM13_handler
+                0x08000250                I2C3_ER_handler
+                0x08000250                SysTick_handler
+                0x08000250                DMA1_Stream3_handler
+                0x08000250                MemManage_handler
+                0x08000250                PVD_handler
+                0x08000250                EXTI9_5_handler
+                0x08000250                SPI4_handler
+                0x08000250                RTC_WKUP_handler
+                0x08000250                SPDIF_RX_handler
+                0x08000250                HardFault_handler
+                0x08000250                EXTI15_10_handler
+                0x08000250                DMA1_Stream5_handler
+                0x08000250                FPU_handler
+                0x08000250                DMA2_Stream5_handler
+                0x08000250                UART5_handler
+                0x08000250                HDMI_CEC_handler
+                0x08000250                RCC_handler
+                0x08000250                TIM8_CC_handler
+                0x08000250                DebugMon_handler
+                0x08000250                EXTI2_handler
+                0x08000250                SVC_handler
+                0x08000250                DMA2_Stream1_handler
+                0x08000250                TIM7_handler
+                0x08000250                I2C1_ER_handler
+                0x08000250                I2C2_EV_handler
+                0x08000250                OTG_FS_WKUP_handler
+                0x08000250                DCMI_handler
+                0x08000250                EXTI3_handler
+                0x08000250                DMA2_Stream0_handler
+                0x08000250                FLASH_handler
+                0x08000250                OTG_HS_EP1_OUT_handler
+                0x08000250                FMPI2C1_ER_handler
+                0x08000250                OTG_FS_handler
+                0x08000250                DMA1_Stream4_handler
+                0x08000250                I2C2_ER_handler
+                0x08000250                TIM1_BRK_TIM9_handler
+                0x08000250                TAMP_STAMP_handler
+                0x08000250                USART6_handler
+                0x08000250                TIM4_handler
+                0x08000250                DMA1_Stream2_handler
+                0x08000250                EXTI4_handler
+                0x08000250                FSMC_handler
+                0x08000250                CAN1_TX_handler
+                0x08000250                CAN2_RX0_handler
+                0x08000250                DMA1_Stream6_handler
+                0x08000250                CAN2_TX_handler
+                0x08000250                CAN2_SCE_handler
+                0x08000250                ADC_handler
+                0x08000250                I2C1_EV_handler
+                0x08000250                CAN1_RX0_handler
+                0x08000250                SPI1_handler
+                0x08000250                DMA2_Stream4_handler
+                0x08000250                PendSV_handler
+                0x08000250                DMA2_Stream7_handler
+                0x08000250                QuadSPI_handler
+                0x08000250                UsageFault_handler
+                0x08000250                DMA1_Stream0_handler
+                0x08000250                DMA2_Stream2_handler
+                0x08000250                EXTI1_handler
+                0x08000250                TIM1_TRG_COM_TIM11_handler
+                0x08000250                TIM5_handler
+                0x08000250                CAN1_SCE_handler
+                0x08000250                I2C3_EV_handler
+                0x08000250                BusFault_handler
+                0x08000250                CAN2_RX1_handler
+                0x08000250                TIM1_CC_handler
+                0x08000250                USART3_handler
+                0x08000250                Default_handler
+ *(.rodata)
+                0x08000256                        _etext = .
+
+.glue_7         0x08000258        0x0
+ .glue_7        0x08000258        0x0 linker stubs
+
+.glue_7t        0x08000258        0x0
+ .glue_7t       0x08000258        0x0 linker stubs
+
+.vfp11_veneer   0x08000258        0x0
+ .vfp11_veneer  0x08000258        0x0 linker stubs
+
+.v4_bx          0x08000258        0x0
+ .v4_bx         0x08000258        0x0 linker stubs
+
+.iplt           0x08000258        0x0
+ .iplt          0x08000258        0x0 LED_ON.o
+
+.rel.dyn        0x08000258        0x0
+ .rel.iplt      0x08000258        0x0 LED_ON.o
+
+.data           0x20000000        0x0 load address 0x08000256
+                0x20000000                        _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 LED_ON.o
+ .data          0x20000000        0x0 startup_LED_ON.o
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x08000256
+ .igot.plt      0x20000000        0x0 LED_ON.o
+
+.bss            0x20000000        0x0 load address 0x08000256
+                0x20000000                        _sbss = .
+ *(.bss)
+ .bss           0x20000000        0x0 LED_ON.o
+ .bss           0x20000000        0x0 startup_LED_ON.o
+ *(COMMON)
+                0x20000000                        _ebss = .
+OUTPUT(final.elf elf32-littlearm)
+LOAD linker stubs
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 LED_ON.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046       0x47 startup_LED_ON.o
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e LED_ON.o
+ .ARM.attributes
+                0x0000002e       0x2e startup_LED_ON.o
