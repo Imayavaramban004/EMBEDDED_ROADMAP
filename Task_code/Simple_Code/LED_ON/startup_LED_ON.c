@@ -7,6 +7,20 @@
 
 #define STACK_START SRAM_END
 
+
+extern uint32_t _etext;
+extern uint32_t _stext;
+extern uint32_t _edata;
+extern uint32_t _sdata;
+extern uint32_t _sbss;
+extern uint32_t _ebss;
+
+
+
+int main(void);
+
+
+
 void Reset_handler(void);
 
 
@@ -248,6 +262,25 @@ uint32_t vector_table[] __attribute__((section(".isr_vector"))) =
     (uint32_t)&FMPI2C1_ER_handler     // 96
 };
 void Reset_handler(void){
+	//Copy .data section to SRAM
+	uint32_t size= (uint32_t)&_etext-(uint32_t)&_stext;
+	uint8_t *pdest= (uint8_t*)&_sdata; _stext;
+	uint8_t *psrc= (uint8_t*)&_stext;
+	for(uint32_t i=0;i<size;i++){
+		*pdest++=*psrc++;
+	}
+	
+	//Init the BSS section to 0
+	uint8_t *pbss= (uint8_t*)&_sbss;
+	uint32_t size1= (uint32_t)&_ebss-(uint32_t)&_sbss;
+	while(size1>0){
+		*pbss=0;
+		size--;
+	}
+	
+	//Call the main
+	main();
+
 }
 void Default_handler(void){
 	while(1);

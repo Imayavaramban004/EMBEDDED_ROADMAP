@@ -9,5 +9,8 @@ startup_LED_ON.o:startup_LED_ON.c
 final.elf: LED_ON.o startup_LED_ON.o
 	$(CC) $(LDFLAGS) -o $@ $^
 clean:
-	rm -rf *.o *.elf
+	del /Q *.o *.elf
 all:LED_ON_Output_Makefile.o startup_LED_ON.o final.elf
+load:
+	openocd -f board/stm32f4discovery.cfg
+
