@@ -164,8 +164,8 @@ int main(void)
     }
 
     /* Drive the LED high */
-    status = GPIO_WritePin(&LED_PA5, GPIO_PIN_SET);
- 80001f6:	2101      	movs	r1, #1
+    status = GPIO_WritePin(&LED_PA5, GPIO_PIN_RESET);
+ 80001f6:	2100      	movs	r1, #0
  80001f8:	4808      	ldr	r0, [pc, #32]	@ (800021c <main+0x48>)
  80001fa:	f000 f8df 	bl	80003bc <GPIO_WritePin>
  80001fe:	4603      	mov	r3, r0

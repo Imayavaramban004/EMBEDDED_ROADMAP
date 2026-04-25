@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STM32F4 · UART4 Complete Flow — Industry Reference</title>
+  <style>
+    /* ------------------------------------------------------------------ */
+    /* RESET & TOKENS                                                       */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #111827;
+      --card:      #1a2236;
+      --border:    #2d3a52;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+
+      --clk:       #f59e0b;   /* amber  — clock / RCC            */
+      --gpio:      #22c55e;   /* green  — GPIO                   */
+      --uart:      #38bdf8;   /* sky    — UART4                  */
+      --stk:       #a78bfa;   /* violet — SysTick                */
+      --app:       #fb7185;   /* rose   — application logic      */
+      --term:      #e2e8f0;   /* white  — start / end            */
+
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* HEADER                                                               */
+    /* ------------------------------------------------------------------ */
+    header {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1a2a4a 50%, #0d1b2a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 120% at 50% -20%, rgba(56,189,248,0.12), transparent);
+      pointer-events: none;
+    }
+    .header-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(56,189,248,.1);
+      border: 1px solid rgba(56,189,248,.3);
+      border-radius: 99px;
+      padding: .25rem .85rem;
+      font-size: .72rem; font-weight: 600; letter-spacing: .08em;
+      color: var(--uart); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 700; letter-spacing: -.02em;
+      background: linear-gradient(90deg, #e2e8f0 0%, #38bdf8 60%, #a78bfa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      color: var(--muted); font-size: .95rem; margin-top: .5rem; max-width: 65ch;
+    }
+    .header-meta {
+      display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .meta-chip {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .8rem; font-weight: 500; color: var(--muted);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ------------------------------------------------------------------ */
+    /* LEGEND                                                               */
+    /* ------------------------------------------------------------------ */
+    .legend {
+      display: flex; gap: 1.2rem; padding: 1rem 3rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: .45rem;
+      font-size: .78rem; font-weight: 500; color: var(--muted);
+    }
+    .legend-box {
+      width: 14px; height: 14px; border-radius: 3px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* MAIN LAYOUT                                                          */
+    /* ------------------------------------------------------------------ */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: calc(100vh - 180px);
+    }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* FLOWCHART PANEL                                                      */
+    /* ------------------------------------------------------------------ */
+    .fc-panel {
+      padding: 2.5rem 2rem;
+      border-right: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .fc-panel h2 {
+      font-size: 1rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: 2rem;
+    }
+
+    /* Flowchart nodes */
+    .fc-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      min-width: 340px;
+    }
+
+    /* Arrow between nodes */
+    .fc-arrow {
+      width: 2px; min-height: 28px;
+      background: linear-gradient(to bottom, var(--border), var(--border));
+      position: relative; flex-shrink: 0;
+    }
+    .fc-arrow::after {
+      content: '';
+      position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--border);
+    }
+    .fc-arrow.clk  { background: var(--clk);  } .fc-arrow.clk::after  { border-top-color: var(--clk);  }
+    .fc-arrow.gpio { background: var(--gpio); } .fc-arrow.gpio::after { border-top-color: var(--gpio); }
+    .fc-arrow.uart { background: var(--uart); } .fc-arrow.uart::after { border-top-color: var(--uart); }
+    .fc-arrow.stk  { background: var(--stk);  } .fc-arrow.stk::after  { border-top-color: var(--stk);  }
+    .fc-arrow.app  { background: var(--app);  } .fc-arrow.app::after  { border-top-color: var(--app);  }
+
+    /* Node base */
+    .node {
+      width: 100%; max-width: 420px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      padding: .85rem 1.2rem;
+      position: relative;
+      transition: transform .15s, box-shadow .15s;
+      cursor: default;
+    }
+    .node:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    }
+    .node-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .35rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .node-title {
+      font-size: .95rem; font-weight: 600;
+    }
+    .node-body {
+      margin-top: .6rem;
+      font-family: var(--font-mono);
+      font-size: .72rem; color: var(--muted);
+      line-height: 1.75;
+    }
+    .node-body .reg   { color: #fbbf24; font-weight: 500; }
+    .node-body .addr  { color: #818cf8; }
+    .node-body .val   { color: #34d399; }
+    .node-body .bit   { color: #fb923c; }
+    .node-body .comm  { color: #6b7280; font-style: italic; }
+
+    /* Terminal node (oval-ish) */
+    .node.terminal {
+      border-radius: 99px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-color: #475569;
+      text-align: center; padding: .75rem 2rem;
+    }
+    .node.terminal .node-title { font-size: 1rem; letter-spacing: .05em; }
+
+    /* Decision diamond */
+    .diamond-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      width: 100%; max-width: 420px;
+    }
+    .diamond {
+      width: 160px; height: 80px;
+      background: var(--card);
+      border: 1.5px solid #475569;
+      transform: rotate(45deg) scale(.85);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .diamond span {
+      transform: rotate(-45deg);
+      font-size: .78rem; font-weight: 600;
+      color: var(--text); white-space: nowrap;
+    }
+    .diamond-labels {
+      display: flex; justify-content: space-between;
+      width: 100%; font-size: .7rem; font-weight: 600;
+      color: var(--muted); padding: 0 1rem;
+    }
+
+    /* Loop-back indicator */
+    .loop-back {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .72rem; font-weight: 600;
+      color: var(--app); margin-top: .5rem;
+      font-family: var(--font-mono);
+    }
+
+    /* Colour variants */
+    .node.clk  { border-color: color-mix(in srgb, var(--clk)  30%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--clk) 15%, transparent) inset; }
+    .node.gpio { border-color: color-mix(in srgb, var(--gpio) 30%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--gpio) 15%, transparent) inset; }
+    .node.uart { border-color: color-mix(in srgb, var(--uart) 30%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--uart) 15%, transparent) inset; }
+    .node.stk  { border-color: color-mix(in srgb, var(--stk)  30%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--stk) 15%, transparent) inset; }
+    .node.app  { border-color: color-mix(in srgb, var(--app)  30%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--app) 15%, transparent) inset; }
+
+    .lbl.clk  { color: var(--clk);  }
+    .lbl.gpio { color: var(--gpio); }
+    .lbl.uart { color: var(--uart); }
+    .lbl.stk  { color: var(--stk);  }
+    .lbl.app  { color: var(--app);  }
+
+    /* ------------------------------------------------------------------ */
+    /* PSEUDOCODE PANEL                                                     */
+    /* ------------------------------------------------------------------ */
+    .ps-panel {
+      padding: 2.5rem 2rem;
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .ps-panel h2 {
+      font-size: 1rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: 2rem;
+    }
+    .ps-section {
+      margin-bottom: 1.6rem;
+    }
+    .ps-section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .35rem .8rem;
+      border-radius: 4px 4px 0 0;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .ps-section-title.clk  { background: color-mix(in srgb, var(--clk)  18%, transparent); color: var(--clk);  border-left: 3px solid var(--clk);  }
+    .ps-section-title.gpio { background: color-mix(in srgb, var(--gpio) 18%, transparent); color: var(--gpio); border-left: 3px solid var(--gpio); }
+    .ps-section-title.uart { background: color-mix(in srgb, var(--uart) 18%, transparent); color: var(--uart); border-left: 3px solid var(--uart); }
+    .ps-section-title.stk  { background: color-mix(in srgb, var(--stk)  18%, transparent); color: var(--stk);  border-left: 3px solid var(--stk);  }
+    .ps-section-title.app  { background: color-mix(in srgb, var(--app)  18%, transparent); color: var(--app);  border-left: 3px solid var(--app);  }
+
+    pre.pseudo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 1.1rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      line-height: 1.9;
+      overflow-x: auto;
+      tab-size: 2;
+    }
+    .kw   { color: #c084fc; font-weight: 600; }  /* keyword    */
+    .fn   { color: #38bdf8; }                    /* function   */
+    .reg  { color: #fbbf24; font-weight: 500; }  /* register   */
+    .addr { color: #818cf8; }                    /* address    */
+    .val  { color: #34d399; }                    /* value      */
+    .bit  { color: #fb923c; }                    /* bit pos    */
+    .cmt  { color: #4b5563; font-style: italic; } /* comment   */
+    .str  { color: #a3e635; }                    /* string     */
+    .lop  { color: var(--app); font-weight: 600; } /* loop    */
+
+    /* ------------------------------------------------------------------ */
+    /* REGISTER TABLE (bottom)                                              */
+    /* ------------------------------------------------------------------ */
+    .reg-section {
+      padding: 2.5rem 3rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .reg-section h2 {
+      font-size: 1rem; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: 1.5rem;
+    }
+    .reg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .reg-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .reg-card-hdr {
+      padding: .6rem 1rem;
+      font-size: .77rem; font-weight: 700;
+      letter-spacing: .05em; text-transform: uppercase;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .reg-card-hdr.clk  { background: color-mix(in srgb, var(--clk)  20%, #1a2236); color: var(--clk);  }
+    .reg-card-hdr.gpio { background: color-mix(in srgb, var(--gpio) 20%, #1a2236); color: var(--gpio); }
+    .reg-card-hdr.uart { background: color-mix(in srgb, var(--uart) 20%, #1a2236); color: var(--uart); }
+    .reg-card-hdr.stk  { background: color-mix(in srgb, var(--stk)  20%, #1a2236); color: var(--stk);  }
+    .addr-tag {
+      font-family: var(--font-mono); font-size: .68rem;
+      color: #818cf8; font-weight: 400;
+    }
+    table.regtab {
+      width: 100%; border-collapse: collapse;
+      font-size: .76rem; font-family: var(--font-mono);
+    }
+    table.regtab th {
+      background: rgba(255,255,255,.03);
+      padding: .45rem .8rem;
+      text-align: left; color: var(--muted);
+      font-weight: 600; font-size: .68rem;
+      text-transform: uppercase; letter-spacing: .07em;
+      border-bottom: 1px solid var(--border);
+    }
+    table.regtab td {
+      padding: .45rem .8rem;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      vertical-align: middle;
+    }
+    table.regtab tr:last-child td { border-bottom: none; }
+    .pill {
+      display: inline-block;
+      padding: .1rem .5rem; border-radius: 4px;
+      font-size: .68rem; font-weight: 600;
+    }
+    .pill.set   { background: rgba(34,197,94,.15);  color: #4ade80; }
+    .pill.clear { background: rgba(239,68,68,.1);   color: #f87171; }
+    .pill.val   { background: rgba(56,189,248,.1);  color: #7dd3fc; }
+
+    /* ------------------------------------------------------------------ */
+    /* FOOTER                                                               */
+    /* ------------------------------------------------------------------ */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: .75rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====================================================================
+     HEADER
+     ==================================================================== -->
+<header>
+  <div class="header-badge">⚙ STM32F4xx · RM0090 Reference</div>
+  <h1>UART4 Complete Initialisation Flow</h1>
+  <p>
+    Industry-standard bare-metal driver flow — UART4 on <strong>PA0 (TX) / PA1 (RX)</strong>
+    via <strong>AF8</strong>, APB1 bus, 115200 baud, 8-N-1.
+    All register addresses and bit values sourced from RM0090 Rev 19 and PM0214 Rev 10.
+  </p>
+  <div class="header-meta">
+    <span class="meta-chip"><span class="dot" style="background:var(--stk)"></span>SysTick @ 16 MHz HSI</span>
+    <span class="meta-chip"><span class="dot" style="background:var(--clk)"></span>RCC · AHB1 + APB1</span>
+    <span class="meta-chip"><span class="dot" style="background:var(--gpio)"></span>GPIOA · PA0 PA1 · AF8</span>
+    <span class="meta-chip"><span class="dot" style="background:var(--uart)"></span>UART4 · 0x4000 4C00</span>
+    <span class="meta-chip"><span class="dot" style="background:var(--app)"></span>App Loop · Echo + 1 s Delay</span>
+  </div>
+</header>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-box" style="background:var(--stk);opacity:.7"></div>SysTick Init</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--clk);opacity:.7"></div>RCC / Clock</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--gpio);opacity:.7"></div>GPIO Config</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--uart);opacity:.7"></div>UART4 Config</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--app);opacity:.7"></div>Application Logic</div>
+</div>
+
+<!-- ====================================================================
+     MAIN LAYOUT — Flowchart | Pseudocode
+     ==================================================================== -->
+<div class="layout">
+
+  <!-- ==================== FLOWCHART ==================== -->
+  <div class="fc-panel">
+    <h2>▶ Visual Flowchart</h2>
+    <div class="fc-wrap">
+
+      <!-- START -->
+      <div class="node terminal">
+        <div class="node-title">⬤ &nbsp;RESET / POWER-ON</div>
+      </div>
+      <div class="fc-arrow stk" style="min-height:24px"></div>
+
+      <!-- STEP 4: SysTick -->
+      <div class="node stk">
+        <div class="node-label"><span class="lbl stk">◆ STEP 4</span> SysTick Initialisation</div>
+        <div class="node-title">Configure Cortex-M4 SysTick Timer</div>
+        <div class="node-body">
+          <span class="reg">STK_CTRL</span> &nbsp;<span class="addr">0xE000E010</span> &nbsp;← <span class="val">0x0</span> &nbsp;<span class="comm">// disable while configuring</span><br>
+          <span class="reg">STK_LOAD</span> &nbsp;<span class="addr">0xE000E014</span> &nbsp;← <span class="val">15999</span> &nbsp;<span class="comm">// 16 MHz / 1000 - 1</span><br>
+          <span class="reg">STK_VAL &nbsp;</span> <span class="addr">0xE000E018</span> &nbsp;← <span class="val">0x0</span> &nbsp;<span class="comm">// clear current counter</span><br>
+          <span class="reg">STK_CTRL</span> &nbsp;<span class="addr">0xE000E010</span> &nbsp;← <span class="val">0x7</span> &nbsp;<span class="comm">// CLKSOURCE|TICKINT|ENABLE</span>
+        </div>
+      </div>
+      <div class="fc-arrow clk" style="min-height:24px"></div>
+
+      <!-- STEP 1a: AHB1ENR -->
+      <div class="node clk">
+        <div class="node-label"><span class="lbl clk">◆ STEP 1a</span> AHB1 Clock Enable</div>
+        <div class="node-title">Enable GPIOA Clock — RCC AHB1ENR</div>
+        <div class="node-body">
+          <span class="reg">RCC_AHB1ENR</span> <span class="addr">0x40023830</span><br>
+          Offset <span class="bit">0x30</span> &nbsp;|= <span class="bit">bit 0</span> &nbsp;<span class="comm">// GPIOAEN = 1</span><br>
+          Read-back ×2 to flush AHB pipeline
+        </div>
+      </div>
+      <div class="fc-arrow clk" style="min-height:24px"></div>
+
+      <!-- STEP 1b: APB1ENR -->
+      <div class="node clk">
+        <div class="node-label"><span class="lbl clk">◆ STEP 1b</span> APB1 Clock Enable</div>
+        <div class="node-title">Enable UART4 Clock — RCC APB1ENR</div>
+        <div class="node-body">
+          <span class="reg">RCC_APB1ENR</span> <span class="addr">0x40023840</span><br>
+          Offset <span class="bit">0x40</span> &nbsp;|= <span class="bit">bit 19</span> &nbsp;<span class="comm">// UART4EN = 1</span><br>
+          Read-back ×2 to flush APB pipeline
+        </div>
+      </div>
+      <div class="fc-arrow gpio" style="min-height:24px"></div>
+
+      <!-- STEP 2a: PA0 GPIO -->
+      <div class="node gpio">
+        <div class="node-label"><span class="lbl gpio">◆ STEP 2a</span> GPIO PA0 — UART4 TX</div>
+        <div class="node-title">Configure PA0 → AF8 (Push-Pull, Low, Pull-Up)</div>
+        <div class="node-body">
+          <span class="reg">GPIOA_MODER  </span> <span class="addr">0x40020000</span>&nbsp; PA0[1:0] = <span class="val">10</span> <span class="comm">// AF</span><br>
+          <span class="reg">GPIOA_OTYPER </span> <span class="addr">0x40020004</span>&nbsp; bit 0   = <span class="val">0</span> &nbsp;<span class="comm">// PP</span><br>
+          <span class="reg">GPIOA_OSPEEDR</span> <span class="addr">0x40020008</span>&nbsp; PA0[1:0] = <span class="val">00</span> <span class="comm">// Low</span><br>
+          <span class="reg">GPIOA_PUPDR  </span> <span class="addr">0x4002000C</span>&nbsp; PA0[1:0] = <span class="val">01</span> <span class="comm">// PU</span><br>
+          <span class="reg">GPIOA_AFRL   </span> <span class="addr">0x40020020</span>&nbsp; [3:0]   = <span class="val">1000</span> <span class="comm">// AF8</span>
+        </div>
+      </div>
+      <div class="fc-arrow gpio" style="min-height:24px"></div>
+
+      <!-- STEP 2b: PA1 GPIO -->
+      <div class="node gpio">
+        <div class="node-label"><span class="lbl gpio">◆ STEP 2b</span> GPIO PA1 — UART4 RX</div>
+        <div class="node-title">Configure PA1 → AF8 (Push-Pull, Low, Pull-Up)</div>
+        <div class="node-body">
+          <span class="reg">GPIOA_MODER  </span>&nbsp; PA1[3:2] = <span class="val">10</span> <span class="comm">// AF</span><br>
+          <span class="reg">GPIOA_OTYPER </span>&nbsp; bit 1   = <span class="val">0</span> &nbsp;<span class="comm">// PP</span><br>
+          <span class="reg">GPIOA_OSPEEDR</span>&nbsp; PA1[3:2] = <span class="val">00</span> <span class="comm">// Low</span><br>
+          <span class="reg">GPIOA_PUPDR  </span>&nbsp; PA1[3:2] = <span class="val">01</span> <span class="comm">// PU</span><br>
+          <span class="reg">GPIOA_AFRL   </span>&nbsp; [7:4]   = <span class="val">1000</span> <span class="comm">// AF8</span>
+        </div>
+      </div>
+      <div class="fc-arrow uart" style="min-height:24px"></div>
+
+      <!-- STEP 3: UART4 Config -->
+      <div class="node uart">
+        <div class="node-label"><span class="lbl uart">◆ STEP 3</span> UART4 Peripheral Configuration</div>
+        <div class="node-title">Configure UART4 — Base: 0x4000 4C00</div>
+        <div class="node-body">
+          <span class="reg">UART4_CR1</span> &amp;= ~UE &nbsp;<span class="comm">// disable before config</span><br>
+          <span class="reg">UART4_BRR</span>  = <span class="val">138</span> &nbsp;&nbsp;<span class="comm">// 16 000 000 / 115200</span><br>
+          <span class="reg">UART4_CR2</span>  : STOP[13:12] = <span class="val">00</span> <span class="comm">// 1 stop bit</span><br>
+          <span class="reg">UART4_CR3</span>  : RTSE=<span class="val">0</span>, CTSE=<span class="val">0</span> &nbsp;<span class="comm">// no HW flow</span><br>
+          <span class="reg">UART4_CR1</span>  : M=<span class="val">0</span> (8-bit), PCE=<span class="val">0</span>, PS=<span class="val">0</span><br>
+          <span class="reg">UART4_CR1</span>  : TE=<span class="val">1</span>, RE=<span class="val">1</span> &nbsp;<span class="comm">// TX+RX enabled</span><br>
+          <span class="reg">UART4_CR1</span>  |= UE &nbsp;&nbsp;<span class="comm">// enable UART4 last</span>
+        </div>
+      </div>
+      <div class="fc-arrow app" style="min-height:24px"></div>
+
+      <!-- STEP 5a: Boot Banner -->
+      <div class="node app">
+        <div class="node-label"><span class="lbl app">◆ STEP 5</span> Application — Boot Banner</div>
+        <div class="node-title">Transmit boot string over UART4</div>
+        <div class="node-body">
+          Wait UART4_SR.TXE = <span class="val">1</span><br>
+          Write each byte to <span class="reg">UART4_DR</span><br>
+          Repeat until <span class="val">'\0'</span> reached
+        </div>
+      </div>
+      <div class="fc-arrow app" style="min-height:24px"></div>
+
+      <!-- Decision: infinite loop -->
+      <div class="diamond-wrap">
+        <div class="diamond">
+          <span>for (;;)</span>
+        </div>
+        <div class="diamond-labels">
+          <span style="color:var(--app)">← continue</span>
+          <span style="color:var(--muted)">always</span>
+        </div>
+      </div>
+      <div class="fc-arrow app" style="min-height:24px"></div>
+
+      <!-- TX Message -->
+      <div class="node app">
+        <div class="node-label"><span class="lbl app">◆ LOOP</span> Transmit Message</div>
+        <div class="node-title">UART_TransmitString — "Hello from UART4!\r\n"</div>
+        <div class="node-body">
+          Poll <span class="reg">UART4_SR</span>.TXE per byte<br>
+          Write byte → <span class="reg">UART4_DR</span><br>
+          Check timeout (<span class="val">100 000</span> iterations)
+        </div>
+      </div>
+      <div class="fc-arrow stk" style="min-height:24px"></div>
+
+      <!-- Delay -->
+      <div class="node stk">
+        <div class="node-label"><span class="lbl stk">◆ LOOP</span> SysTick Delay</div>
+        <div class="node-title">SysTick_DelayMs(1000) — 1 second</div>
+        <div class="node-body">
+          Record <span class="reg">start</span> = s_tick_ms<br>
+          Spin while (s_tick_ms − start) &lt; <span class="val">1000</span>
+        </div>
+      </div>
+
+      <!-- Loop-back arrow indicator -->
+      <div class="loop-back">↩ &nbsp;loop back to TRANSMIT MESSAGE</div>
+      <div style="height:20px"></div>
+
+    </div>
+  </div>
+
+  <!-- ==================== PSEUDOCODE ==================== -->
+  <div class="ps-panel">
+    <h2>▶ Pseudocode</h2>
+
+    <!-- SYSTICK -->
+    <div class="ps-section">
+      <div class="ps-section-title stk">◆ STEP 4 — SysTick Initialisation</div>
+<pre class="pseudo"><span class="cmt">// Cortex-M4 System Timer — PM0214 §4.4</span>
+<span class="cmt">// Base: 0xE000E010</span>
+
+<span class="fn">PROCEDURE</span> SysTick_Init(cpu_hz):
+  <span class="reg">STK_CTRL</span>  ← <span class="val">0x0</span>           <span class="cmt">// disable counter before setup</span>
+  reload    ← cpu_hz / <span class="val">1000</span> - <span class="val">1</span> <span class="cmt">// 16 MHz → 15999</span>
+  <span class="reg">STK_LOAD</span>  ← reload &amp; <span class="val">0x00FFFFFF</span>
+  <span class="reg">STK_VAL</span>   ← <span class="val">0x0</span>           <span class="cmt">// clear current value</span>
+  <span class="reg">STK_CTRL</span>  ← <span class="val">0x7</span>           <span class="cmt">// CLKSOURCE=1 TICKINT=1 ENABLE=1</span>
+<span class="fn">END PROCEDURE</span>
+
+<span class="fn">INTERRUPT</span> SysTick_Handler():
+  s_tick_ms ← s_tick_ms + <span class="val">1</span>   <span class="cmt">// fires every 1 ms</span>
+<span class="fn">END INTERRUPT</span>
+
+<span class="fn">PROCEDURE</span> SysTick_DelayMs(ms):
+  start ← s_tick_ms
+  <span class="kw">WHILE</span> (s_tick_ms - start) &lt; ms: busy-wait
+<span class="fn">END PROCEDURE</span></pre>
+    </div>
+
+    <!-- RCC -->
+    <div class="ps-section">
+      <div class="ps-section-title clk">◆ STEP 1 — RCC Peripheral Clock Enable</div>
+<pre class="pseudo"><span class="cmt">// RCC base: 0x40023800  (RM0090 §6.3)</span>
+
+<span class="cmt">// 1a — AHB1ENR: enable GPIOA clock (bit 0)</span>
+<span class="reg">RCC_AHB1ENR</span>  [<span class="addr">0x40023830</span>] |= (<span class="val">1</span> &lt;&lt; <span class="bit">0</span>)  <span class="cmt">// GPIOAEN</span>
+READ <span class="reg">RCC_AHB1ENR</span>                          <span class="cmt">// flush ×2</span>
+READ <span class="reg">RCC_AHB1ENR</span>
+
+<span class="cmt">// 1b — APB1ENR: enable UART4 clock (bit 19)</span>
+<span class="reg">RCC_APB1ENR</span>  [<span class="addr">0x40023840</span>] |= (<span class="val">1</span> &lt;&lt; <span class="bit">19</span>) <span class="cmt">// UART4EN</span>
+READ <span class="reg">RCC_APB1ENR</span>                          <span class="cmt">// flush ×2</span>
+READ <span class="reg">RCC_APB1ENR</span></pre>
+    </div>
+
+    <!-- GPIO PA0 -->
+    <div class="ps-section">
+      <div class="ps-section-title gpio">◆ STEP 2a — GPIO PA0 → UART4 TX (AF8)</div>
+<pre class="pseudo"><span class="cmt">// GPIOA base: 0x40020000  (RM0090 §8)</span>
+<span class="cmt">// PA0 — TX — AF8 — Push-Pull — Low Speed — Pull-Up</span>
+
+<span class="cmt">// Pre-drive ODR before enabling AF (prevent glitch)</span>
+
+<span class="cmt">// OTYPER: bit 0 = 0 (Push-Pull)</span>
+<span class="reg">GPIOA_OTYPER</span>  [<span class="addr">0x40020004</span>] &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">0</span>)
+
+<span class="cmt">// OSPEEDR: PA0[1:0] = 00 (Low Speed)</span>
+<span class="reg">GPIOA_OSPEEDR</span> [<span class="addr">0x40020008</span>] &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">0</span>)
+<span class="reg">GPIOA_OSPEEDR</span>              |=  (<span class="val">0x0</span> &lt;&lt; <span class="bit">0</span>)
+
+<span class="cmt">// PUPDR: PA0[1:0] = 01 (Pull-Up)</span>
+<span class="reg">GPIOA_PUPDR</span>   [<span class="addr">0x4002000C</span>] &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">0</span>)
+<span class="reg">GPIOA_PUPDR</span>               |=  (<span class="val">0x1</span> &lt;&lt; <span class="bit">0</span>)
+
+<span class="cmt">// AFRL: PA0[3:0] = 1000 = 0x8 (AF8 → UART4)</span>
+<span class="reg">GPIOA_AFRL</span>    [<span class="addr">0x40020020</span>] &amp;= ~(<span class="val">0xF</span> &lt;&lt; <span class="bit">0</span>)
+<span class="reg">GPIOA_AFRL</span>                |=  (<span class="val">0x8</span> &lt;&lt; <span class="bit">0</span>)
+
+<span class="cmt">// MODER: PA0[1:0] = 10 (AF) — written LAST</span>
+<span class="reg">GPIOA_MODER</span>   [<span class="addr">0x40020000</span>] &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">0</span>)
+<span class="reg">GPIOA_MODER</span>               |=  (<span class="val">0x2</span> &lt;&lt; <span class="bit">0</span>)</pre>
+    </div>
+
+    <!-- GPIO PA1 -->
+    <div class="ps-section">
+      <div class="ps-section-title gpio">◆ STEP 2b — GPIO PA1 → UART4 RX (AF8)</div>
+<pre class="pseudo"><span class="cmt">// PA1 — RX — AF8 — Push-Pull — Low Speed — Pull-Up</span>
+
+<span class="cmt">// OTYPER: bit 1 = 0 (Push-Pull)</span>
+<span class="reg">GPIOA_OTYPER</span>  &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">1</span>)
+
+<span class="cmt">// OSPEEDR: PA1[3:2] = 00 (Low Speed)</span>
+<span class="reg">GPIOA_OSPEEDR</span> &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">2</span>)
+<span class="reg">GPIOA_OSPEEDR</span> |=  (<span class="val">0x0</span> &lt;&lt; <span class="bit">2</span>)
+
+<span class="cmt">// PUPDR: PA1[3:2] = 01 (Pull-Up)</span>
+<span class="reg">GPIOA_PUPDR</span>   &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">2</span>)
+<span class="reg">GPIOA_PUPDR</span>   |=  (<span class="val">0x1</span> &lt;&lt; <span class="bit">2</span>)
+
+<span class="cmt">// AFRL: PA1[7:4] = 1000 = 0x8 (AF8 → UART4)</span>
+<span class="reg">GPIOA_AFRL</span>    &amp;= ~(<span class="val">0xF</span> &lt;&lt; <span class="bit">4</span>)
+<span class="reg">GPIOA_AFRL</span>    |=  (<span class="val">0x8</span> &lt;&lt; <span class="bit">4</span>)
+
+<span class="cmt">// MODER: PA1[3:2] = 10 (AF) — written LAST</span>
+<span class="reg">GPIOA_MODER</span>   &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">2</span>)
+<span class="reg">GPIOA_MODER</span>   |=  (<span class="val">0x2</span> &lt;&lt; <span class="bit">2</span>)</pre>
+    </div>
+
+    <!-- UART4 -->
+    <div class="ps-section">
+      <div class="ps-section-title uart">◆ STEP 3 — UART4 Peripheral Configuration</div>
+<pre class="pseudo"><span class="cmt">// UART4 base: 0x4000 4C00  (RM0090 §30)</span>
+
+<span class="cmt">// 3a — Disable UART4 before configuring registers</span>
+<span class="reg">UART4_CR1</span>  [<span class="addr">0x4000 4C0C</span>] &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">13</span>) <span class="cmt">// UE = 0</span>
+
+<span class="cmt">// 3b — Baud rate (16x oversampling)</span>
+<span class="cmt">//   BRR = fCK / baud = 16000000 / 115200 ≈ 138</span>
+<span class="reg">UART4_BRR</span>  [<span class="addr">0x4000 4C08</span>] ← <span class="val">138</span>
+
+<span class="cmt">// 3c — CR2: 1 stop bit (STOP[13:12] = 00)</span>
+<span class="reg">UART4_CR2</span>  [<span class="addr">0x4000 4C10</span>] &amp;= ~(<span class="val">0x3</span> &lt;&lt; <span class="bit">12</span>)
+
+<span class="cmt">// 3d — CR3: no hardware flow control</span>
+<span class="reg">UART4_CR3</span>  [<span class="addr">0x4000 4C14</span>] &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">8</span>)  <span class="cmt">// RTSE = 0</span>
+<span class="reg">UART4_CR3</span>                 &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">9</span>)  <span class="cmt">// CTSE = 0</span>
+
+<span class="cmt">// 3e — CR1: 8-bit word, no parity, TX+RX enabled</span>
+<span class="reg">UART4_CR1</span>  &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">12</span>) <span class="cmt">// M = 0 → 8-bit</span>
+<span class="reg">UART4_CR1</span>  &amp;= ~(<span class="val">1</span> &lt;&lt; <span class="bit">10</span>) <span class="cmt">// PCE = 0 → no parity</span>
+<span class="reg">UART4_CR1</span>  |=  (<span class="val">1</span> &lt;&lt; <span class="bit">3</span>)  <span class="cmt">// TE = 1 → transmitter on</span>
+<span class="reg">UART4_CR1</span>  |=  (<span class="val">1</span> &lt;&lt; <span class="bit">2</span>)  <span class="cmt">// RE = 1 → receiver on</span>
+
+<span class="cmt">// 3f — Enable UART4 — UE MUST be set last</span>
+<span class="reg">UART4_CR1</span>  |=  (<span class="val">1</span> &lt;&lt; <span class="bit">13</span>) <span class="cmt">// UE = 1</span></pre>
+    </div>
+
+    <!-- APP -->
+    <div class="ps-section">
+      <div class="ps-section-title app">◆ STEP 5 — Main Application Loop</div>
+<pre class="pseudo"><span class="fn">PROCEDURE</span> UART_TransmitByte(byte):
+  timeout ← <span class="val">100000</span>
+  <span class="kw">WHILE</span> <span class="reg">UART4_SR</span>.TXE = <span class="val">0</span>:
+    timeout ← timeout - <span class="val">1</span>
+    <span class="kw">IF</span> timeout = <span class="val">0</span>: <span class="kw">RETURN</span> ERR_TX_TIMEOUT
+  <span class="reg">UART4_DR</span> ← byte
+  <span class="kw">RETURN</span> OK
+<span class="fn">END PROCEDURE</span>
+
+<span class="fn">PROCEDURE</span> UART_TransmitString(str):
+  <span class="kw">WHILE</span> *str ≠ <span class="val">'\0'</span>:
+    UART_TransmitByte(*str)
+    str ← str + <span class="val">1</span>
+<span class="fn">END PROCEDURE</span>
+
+<span class="cmt">─────────────────────────────────────────</span>
+<span class="cmt">// main()</span>
+<span class="cmt">─────────────────────────────────────────</span>
+SysTick_Init(<span class="val">16000000</span>)
+GPIO_Init(PA0 → UART4_TX_AF8)
+GPIO_Init(PA1 → UART4_RX_AF8)
+UART_Init(UART4, <span class="val">115200</span>, 8N1, TX_RX)
+
+UART_TransmitString(<span class="str">"STM32F4 UART4 Demo\r\n"</span>)
+UART_TransmitString(<span class="str">"TX:PA0  RX:PA1  AF8\r\n"</span>)
+
+<span class="lop">LOOP FOREVER:</span>
+  UART_TransmitString(<span class="str">"Hello from UART4!\r\n"</span>)
+  SysTick_DelayMs(<span class="val">1000</span>)
+<span class="lop">END LOOP</span></pre>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====================================================================
+     REGISTER REFERENCE TABLE
+     ==================================================================== -->
+<div class="reg-section">
+  <h2>▶ Complete Register Reference</h2>
+  <div class="reg-grid">
+
+    <!-- SysTick -->
+    <div class="reg-card">
+      <div class="reg-card-hdr stk">
+        SysTick Registers
+        <span class="addr-tag">Base: 0xE000E010</span>
+      </div>
+      <table class="regtab">
+        <tr><th>Register</th><th>Address</th><th>Value Written</th><th>Meaning</th></tr>
+        <tr><td>STK_CTRL</td><td class="addr-tag">0xE000E010</td><td><span class="pill val">0x0000 0000</span></td><td>Disable before config</td></tr>
+        <tr><td>STK_LOAD</td><td class="addr-tag">0xE000E014</td><td><span class="pill val">0x0000 3E7F</span></td><td>15999 (1 ms @ 16 MHz)</td></tr>
+        <tr><td>STK_VAL</td><td class="addr-tag">0xE000E018</td><td><span class="pill val">0x0000 0000</span></td><td>Clear counter</td></tr>
+        <tr><td>STK_CTRL</td><td class="addr-tag">0xE000E010</td><td><span class="pill set">0x0000 0007</span></td><td>CLKSOURCE|TICKINT|ENABLE</td></tr>
+        <tr><td>STK_CALIB</td><td class="addr-tag">0xE000E01C</td><td colspan="2" style="color:var(--muted);font-style:italic">Read-only — not written</td></tr>
+      </table>
+    </div>
+
+    <!-- RCC -->
+    <div class="reg-card">
+      <div class="reg-card-hdr clk">
+        RCC Registers
+        <span class="addr-tag">Base: 0x4002 3800</span>
+      </div>
+      <table class="regtab">
+        <tr><th>Register</th><th>Offset</th><th>Bit</th><th>Action</th></tr>
+        <tr><td>AHB1ENR</td><td class="addr-tag">0x30</td><td><span class="pill val">bit 0</span></td><td>GPIOAEN = <span class="pill set">1</span></td></tr>
+        <tr><td>APB1ENR</td><td class="addr-tag">0x40</td><td><span class="pill val">bit 19</span></td><td>UART4EN = <span class="pill set">1</span></td></tr>
+      </table>
+    </div>
+
+    <!-- GPIOA PA0 -->
+    <div class="reg-card">
+      <div class="reg-card-hdr gpio">
+        GPIOA — PA0 (TX)
+        <span class="addr-tag">Base: 0x4002 0000</span>
+      </div>
+      <table class="regtab">
+        <tr><th>Register</th><th>Offset</th><th>Bits</th><th>Value</th><th>Meaning</th></tr>
+        <tr><td>MODER</td><td class="addr-tag">0x00</td><td>[1:0]</td><td><span class="pill val">10</span></td><td>Alternate Function</td></tr>
+        <tr><td>OTYPER</td><td class="addr-tag">0x04</td><td>[0]</td><td><span class="pill val">0</span></td><td>Push-Pull</td></tr>
+        <tr><td>OSPEEDR</td><td class="addr-tag">0x08</td><td>[1:0]</td><td><span class="pill val">00</span></td><td>Low Speed</td></tr>
+        <tr><td>PUPDR</td><td class="addr-tag">0x0C</td><td>[1:0]</td><td><span class="pill set">01</span></td><td>Pull-Up</td></tr>
+        <tr><td>AFRL</td><td class="addr-tag">0x20</td><td>[3:0]</td><td><span class="pill set">1000</span></td><td>AF8 → UART4</td></tr>
+      </table>
+    </div>
+
+    <!-- GPIOA PA1 -->
+    <div class="reg-card">
+      <div class="reg-card-hdr gpio">
+        GPIOA — PA1 (RX)
+        <span class="addr-tag">Base: 0x4002 0000</span>
+      </div>
+      <table class="regtab">
+        <tr><th>Register</th><th>Offset</th><th>Bits</th><th>Value</th><th>Meaning</th></tr>
+        <tr><td>MODER</td><td class="addr-tag">0x00</td><td>[3:2]</td><td><span class="pill val">10</span></td><td>Alternate Function</td></tr>
+        <tr><td>OTYPER</td><td class="addr-tag">0x04</td><td>[1]</td><td><span class="pill val">0</span></td><td>Push-Pull</td></tr>
+        <tr><td>OSPEEDR</td><td class="addr-tag">0x08</td><td>[3:2]</td><td><span class="pill val">00</span></td><td>Low Speed</td></tr>
+        <tr><td>PUPDR</td><td class="addr-tag">0x0C</td><td>[3:2]</td><td><span class="pill set">01</span></td><td>Pull-Up</td></tr>
+        <tr><td>AFRL</td><td class="addr-tag">0x20</td><td>[7:4]</td><td><span class="pill set">1000</span></td><td>AF8 → UART4</td></tr>
+      </table>
+    </div>
+
+    <!-- UART4 -->
+    <div class="reg-card" style="grid-column: 1 / -1">
+      <div class="reg-card-hdr uart">
+        UART4 Registers
+        <span class="addr-tag">Base: 0x4000 4C00</span>
+      </div>
+      <table class="regtab">
+        <tr><th>Register</th><th>Offset</th><th>Address</th><th>Reset</th><th>Value Written</th><th>Key Bits</th></tr>
+        <tr><td>SR</td><td class="addr-tag">0x00</td><td class="addr-tag">0x4000 4C00</td><td class="addr-tag">0x00C0</td><td>Read-only flags</td><td>TXE[7], RXNE[5], TC[6], ORE[3], FE[1]</td></tr>
+        <tr><td>DR</td><td class="addr-tag">0x04</td><td class="addr-tag">0x4000 4C04</td><td class="addr-tag">0x0000</td><td>TX byte → write; RX byte → read</td><td>[8:0] data bits</td></tr>
+        <tr><td>BRR</td><td class="addr-tag">0x08</td><td class="addr-tag">0x4000 4C08</td><td class="addr-tag">0x0000</td><td><span class="pill set">138</span></td><td>16 000 000 / 115 200 ≈ 138</td></tr>
+        <tr><td>CR1</td><td class="addr-tag">0x0C</td><td class="addr-tag">0x4000 4C0C</td><td class="addr-tag">0x0000</td><td><span class="pill val">UE|TE|RE</span></td><td>UE[13] M[12] PCE[10] TE[3] RE[2]</td></tr>
+        <tr><td>CR2</td><td class="addr-tag">0x10</td><td class="addr-tag">0x4000 4C10</td><td class="addr-tag">0x0000</td><td><span class="pill clear">STOP=00</span></td><td>STOP[13:12] = 00 → 1 stop bit</td></tr>
+        <tr><td>CR3</td><td class="addr-tag">0x14</td><td class="addr-tag">0x4000 4C14</td><td class="addr-tag">0x0000</td><td><span class="pill clear">0x0000</span></td><td>RTSE[8]=0, CTSE[9]=0 → no flow ctrl</td></tr>
+        <tr><td>GTPR</td><td class="addr-tag">0x18</td><td class="addr-tag">0x4000 4C18</td><td class="addr-tag">0x0000</td><td>Not used</td><td>Guard time / IrDA prescaler</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  STM32F4xx UART4 Flow Reference &nbsp;·&nbsp;
+  RM0090 Rev 19 &nbsp;·&nbsp; PM0214 Rev 10 &nbsp;·&nbsp;
+  Generated for EMBEDDED_ROADMAP / UART_HI project
+</footer>
+
+</body>
+</html>

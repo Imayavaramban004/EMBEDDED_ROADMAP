@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>STM32F4 · UART vs USART — Bare-Metal Guide</title>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#07090f;--surface:#0f1521;--card:#161e30;--card2:#1c2640;
+  --border:#252f45;--border2:#2e3d5c;
+  --text:#e2e8f0;--muted:#7a8ba5;--subtle:#4a5568;
+
+  --uart:  #fb923c; /* orange  — UART  */
+  --usart: #38bdf8; /* sky     — USART */
+  --clk:   #facc15; /* yellow  — RCC   */
+  --gpio:  #4ade80; /* green   — GPIO  */
+  --step:  #a78bfa; /* violet  — steps */
+  --info:  #22d3ee; /* cyan    — info  */
+  --warn:  #f87171; /* red     — warn  */
+  --ok:    #34d399; /* emerald — OK    */
+
+  --mono:'JetBrains Mono','Fira Code','Consolas',monospace;
+  --sans:'Inter','Segoe UI',system-ui,sans-serif;
+  --radius:10px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+
+/* ============================================================
+   STICKY NAV
+   ============================================================ */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,9,15,.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:0;
+  padding:0 2rem;
+  height:56px;
+}
+.nav-brand{
+  font-size:.85rem;font-weight:700;letter-spacing:.05em;
+  color:var(--text);white-space:nowrap;margin-right:2rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.nav-brand span{color:var(--usart)}
+.nav-links{display:flex;gap:0;overflow-x:auto;flex:1}
+.nav-links a{
+  display:flex;align-items:center;gap:.4rem;
+  padding:0 1.1rem;height:56px;
+  font-size:.82rem;font-weight:500;
+  color:var(--muted);text-decoration:none;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;transition:color .2s,border-color .2s;
+}
+.nav-links a:hover{color:var(--text);border-color:var(--border2)}
+.nav-links a.active-uart{color:var(--uart);border-color:var(--uart)}
+.nav-links a.active-usart{color:var(--usart);border-color:var(--usart)}
+.nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  padding:4rem 3rem 3rem;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(56,189,248,.08),transparent);
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.hero-chips{display:flex;justify-content:center;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.chip{
+  padding:.3rem .9rem;border-radius:99px;font-size:.72rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;border:1px solid;
+}
+.chip-uart {background:rgba(251,146,60,.1);color:var(--uart);border-color:rgba(251,146,60,.3)}
+.chip-usart{background:rgba(56,189,248,.1);color:var(--usart);border-color:rgba(56,189,248,.3)}
+.chip-ref  {background:rgba(255,255,255,.05);color:var(--muted);border-color:var(--border2)}
+.hero h1{
+  font-size:clamp(1.8rem,4vw,3rem);font-weight:800;letter-spacing:-.03em;
+  background:linear-gradient(90deg,#e2e8f0 0%,#38bdf8 50%,#fb923c 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:1rem;
+}
+.hero p{color:var(--muted);font-size:1rem;max-width:65ch;margin:0 auto 2rem}
+.hero-cards{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+  max-width:700px;margin:0 auto;
+}
+@media(max-width:600px){.hero-cards{grid-template-columns:1fr}}
+.hero-card{
+  padding:1.2rem 1.4rem;border-radius:var(--radius);
+  text-align:left;border:1px solid;
+}
+.hero-card.uart {background:rgba(251,146,60,.07);border-color:rgba(251,146,60,.25)}
+.hero-card.usart{background:rgba(56,189,248,.07);border-color:rgba(56,189,248,.25)}
+.hero-card h3{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
+.hero-card.uart  h3{color:var(--uart)}
+.hero-card.usart h3{color:var(--usart)}
+.hero-card p{font-size:.8rem;color:var(--muted);line-height:1.5}
+
+/* ============================================================
+   SECTION WRAPPERS
+   ============================================================ */
+section{padding:3rem 3rem;border-bottom:1px solid var(--border)}
+@media(max-width:768px){section{padding:2rem 1.25rem}}
+.section-header{
+  display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;
+}
+.section-badge{
+  padding:.3rem .8rem;border-radius:6px;
+  font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+}
+.badge-uart {background:rgba(251,146,60,.15);color:var(--uart)}
+.badge-usart{background:rgba(56,189,248,.15);color:var(--usart)}
+.badge-cmp  {background:rgba(167,139,250,.15);color:var(--step)}
+.badge-ref  {background:rgba(34,211,238,.15);color:var(--info)}
+.section-header h2{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+
+/* ============================================================
+   STEP CARDS
+   ============================================================ */
+.steps{display:flex;flex-direction:column;gap:0}
+.step-row{
+  display:grid;grid-template-columns:72px 1fr;
+  position:relative;
+}
+.step-row::before{
+  content:'';position:absolute;left:35px;top:72px;bottom:0;
+  width:2px;background:var(--border);
+  z-index:0;
+}
+.step-row:last-child::before{display:none}
+.step-num{
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:1.1rem;z-index:1;
+}
+.step-circle{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:700;flex-shrink:0;border:2px solid;
+}
+.step-content{
+  padding:1rem 0 2rem 1rem;
+}
+.step-title{
+  font-size:1rem;font-weight:700;margin-bottom:.3rem;
+}
+.step-why{
+  font-size:.8rem;color:var(--muted);margin-bottom:.85rem;
+  padding:.5rem .8rem;border-left:3px solid var(--border2);
+  background:rgba(255,255,255,.02);border-radius:0 4px 4px 0;
+}
+.step-why strong{color:var(--text)}
+
+/* UART colours */
+.uart .step-circle{background:rgba(251,146,60,.15);border-color:var(--uart);color:var(--uart)}
+.uart .step-row::before{background:rgba(251,146,60,.2)}
+.uart .step-title{color:var(--uart)}
+/* USART colours */
+.usart .step-circle{background:rgba(56,189,248,.15);border-color:var(--usart);color:var(--usart)}
+.usart .step-row::before{background:rgba(56,189,248,.2)}
+.usart .step-title{color:var(--usart)}
+
+/* ============================================================
+   REG BOXES
+   ============================================================ */
+.reg-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;margin-bottom:.6rem;
+}
+.reg-box-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .9rem;font-family:var(--mono);font-size:.72rem;font-weight:600;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+}
+.reg-name{color:#fbbf24}
+.reg-addr{color:#818cf8;font-weight:400}
+.reg-body{
+  padding:.7rem .9rem;font-family:var(--mono);font-size:.75rem;
+  line-height:1.9;color:var(--muted);
+}
+.rb{color:#fbbf24;font-weight:600}     /* register */
+.rv{color:#4ade80;font-weight:600}     /* value    */
+.rbit{color:#fb923c}                   /* bit pos  */
+.rcmt{color:#4a5568;font-style:italic} /* comment  */
+.rh{color:#a78bfa}                     /* highlight*/
+
+/* Code block */
+pre.codeblock{
+  background:var(--card2);border:1px solid var(--border);border-radius:8px;
+  padding:1rem 1.2rem;font-family:var(--mono);font-size:.77rem;
+  line-height:1.85;overflow-x:auto;color:#cbd5e1;
+}
+.kw{color:#c084fc;font-weight:600}
+.fn{color:#38bdf8}
+.cm{color:#374151;font-style:italic}
+.st{color:#a3e635}
+.vl{color:#34d399;font-weight:600}
+
+/* ============================================================
+   CALLOUT BOXES
+   ============================================================ */
+.callout{
+  display:flex;gap:.75rem;padding:.9rem 1rem;
+  border-radius:8px;border:1px solid;margin-bottom:1rem;
+  font-size:.82rem;line-height:1.55;
+}
+.callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+.callout.info{background:rgba(34,211,238,.06);border-color:rgba(34,211,238,.2);color:#a5f3fc}
+.callout.warn{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2);color:#fca5a5}
+.callout.tip {background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.2);color:#6ee7b7}
+
+/* ============================================================
+   COMPARISON TABLE
+   ============================================================ */
+.cmp-grid{
+  display:grid;grid-template-columns:200px 1fr 1fr;
+  border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+}
+@media(max-width:700px){.cmp-grid{grid-template-columns:120px 1fr 1fr}}
+.cmp-hdr{
+  padding:.8rem 1rem;font-size:.78rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;text-align:center;
+}
+.cmp-hdr.lbl{background:var(--surface);color:var(--muted)}
+.cmp-hdr.uart {background:rgba(251,146,60,.12);color:var(--uart)}
+.cmp-hdr.usart{background:rgba(56,189,248,.12);color:var(--usart)}
+.cmp-cell{
+  padding:.65rem 1rem;font-size:.8rem;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;
+}
+.cmp-cell.label{color:var(--muted);font-weight:500;background:rgba(255,255,255,.015)}
+.cmp-cell:not(.label){color:var(--text);font-family:var(--mono);font-size:.75rem}
+.cmp-cell .pill{
+  display:inline-block;padding:.1rem .45rem;border-radius:4px;
+  font-size:.68rem;font-weight:700;
+}
+.pill-y{background:rgba(52,211,153,.15);color:#6ee7b7}
+.pill-n{background:rgba(248,113,113,.1);color:#fca5a5}
+.pill-p{background:rgba(56,189,248,.1);color:#7dd3fc}
+
+/* ============================================================
+   PIN TABLE
+   ============================================================ */
+.pin-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.pin-table th{
+  background:rgba(255,255,255,.04);padding:.55rem .9rem;
+  text-align:left;color:var(--muted);font-size:.7rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.pin-table td{
+  padding:.55rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);
+  font-family:var(--mono);font-size:.76rem;
+}
+.pin-table tr:last-child td{border-bottom:none}
+.tag-af7{background:rgba(56,189,248,.1);color:#7dd3fc;padding:.1rem .4rem;border-radius:4px;font-size:.68rem;font-weight:600}
+.tag-af8{background:rgba(251,146,60,.1);color:#fdba74;padding:.1rem .4rem;border-radius:4px;font-size:.68rem;font-weight:600}
+.tag-apb1{background:rgba(167,139,250,.1);color:#c4b5fd;padding:.1rem .4rem;border-radius:4px;font-size:.66rem}
+.tag-apb2{background:rgba(244,114,182,.1);color:#f9a8d4;padding:.1rem .4rem;border-radius:4px;font-size:.66rem}
+
+/* ============================================================
+   QUICK REF CARDS
+   ============================================================ */
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+.qr-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.qr-card-hdr{padding:.6rem 1rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.qr-card-hdr.uart{background:rgba(251,146,60,.12);color:var(--uart);border-bottom:1px solid rgba(251,146,60,.2)}
+.qr-card-hdr.usart{background:rgba(56,189,248,.12);color:var(--usart);border-bottom:1px solid rgba(56,189,248,.2)}
+.qr-card-hdr.gen{background:rgba(255,255,255,.04);color:var(--muted);border-bottom:1px solid var(--border)}
+.qr-card pre{padding:.9rem 1rem;font-family:var(--mono);font-size:.74rem;line-height:1.8;overflow-x:auto}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--subtle);border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav>
+  <div class="nav-brand">STM32F4 <span>UART Guide</span></div>
+  <div class="nav-links">
+    <a href="#overview">📖 Overview</a>
+    <a href="#uart-flow"><span class="nav-dot" style="background:var(--uart)"></span>UART Flow</a>
+    <a href="#usart-flow"><span class="nav-dot" style="background:var(--usart)"></span>USART Flow</a>
+    <a href="#compare"><span class="nav-dot" style="background:var(--step)"></span>Compare</a>
+    <a href="#pins">📌 Pin Map</a>
+    <a href="#quickref">⚡ Quick Ref</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<div class="hero" id="overview">
+  <div class="hero-chips">
+    <span class="chip chip-uart">UART4 / UART5</span>
+    <span class="chip chip-usart">USART1–3 / USART6</span>
+    <span class="chip chip-ref">STM32F4 · RM0090</span>
+    <span class="chip chip-ref">Bare-Metal Ready</span>
+  </div>
+  <h1>UART &amp; USART<br>Bare-Metal Production Guide</h1>
+  <p>Learn the exact steps to configure UART and USART on STM32F4 from scratch — no HAL library, no magic. Every register, every bit, explained simply.</p>
+
+  <div class="hero-cards">
+    <div class="hero-card uart">
+      <h3>🔶 UART (Async Only)</h3>
+      <p>UART4 &amp; UART5. Transmits and receives data without a shared clock. Both sides must agree on the same baud rate in advance. Simpler to wire — just TX and RX.</p>
+    </div>
+    <div class="hero-card usart">
+      <h3>🔷 USART (Async + Sync)</h3>
+      <p>USART1, 2, 3, 6. Has all UART features <em>plus</em> an optional CK pin for synchronous mode (like SPI). More flexible but slightly more complex to set up.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 1 — WHAT IS WHAT
+     ============================================================ -->
+<section>
+  <div class="callout info">
+    <div class="callout-icon">💡</div>
+    <div><strong>Beginner tip — the simplest mental model:</strong><br>
+    Think of UART like two people talking on walkie-talkies. They agree beforehand on a speaking speed (baud rate). No shared clock signal needed.<br>
+    USART is the same walkie-talkie but with an extra wire (CK) that can sync both sides to the same heartbeat — useful when you need zero timing error.</div>
+  </div>
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div><strong>Key rule — always enable the clock before touching registers.</strong><br>
+    On STM32F4, every peripheral is clock-gated by default. Writing to GPIO or UART registers without enabling their clock first produces <em>no effect</em> and is a very common beginner mistake.</div>
+  </div>
+  <div class="callout tip">
+    <div class="callout-icon">✅</div>
+    <div><strong>Production rule — set UE (UART Enable) last.</strong><br>
+    Configure BRR, CR2, CR3, and CR1 fields (word length, parity, TE, RE) while UE=0. Then set UE=1 as the final step. This prevents partial configuration from reaching the line.</div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2 — UART FLOW
+     ============================================================ -->
+<section id="uart-flow">
+  <div class="section-header">
+    <span class="section-badge badge-uart">UART</span>
+    <h2>UART4 Step-by-Step Flow</h2>
+  </div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:2rem">
+    UART4 is a <strong style="color:var(--text)">pure asynchronous</strong> peripheral on the APB1 bus.
+    It does NOT have a CK pin. The example below uses <strong style="color:var(--uart)">PA0 (TX)</strong> and <strong style="color:var(--uart)">PA1 (RX)</strong> at <strong style="color:var(--text)">115200 baud, HSI 16 MHz</strong>.
+  </p>
+
+  <div class="steps uart">
+
+    <!-- STEP 1 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">1</div></div>
+      <div class="step-content">
+        <div class="step-title">Enable Peripheral Clocks (RCC)</div>
+        <div class="step-why">
+          <strong>Why?</strong> The STM32F4 powers off all peripherals by default to save energy.
+          You must tell the RCC (Reset &amp; Clock Control) to turn on the clocks for GPIOA (for the pins)
+          and UART4 (for the peripheral) before touching any of their registers.
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr">
+            <span class="reg-name">RCC_AHB1ENR</span>
+            <span class="reg-addr">0x40023830 &nbsp;(offset 0x30)</span>
+          </div>
+          <div class="reg-body">
+            <span class="rbit">Bit 0</span> = <span class="rv">1</span> &nbsp;<span class="rcmt">// GPIOAEN — enable GPIOA clock</span><br>
+            <span class="rcmt">Reset value: 0x0000 0000</span>
+          </div>
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr">
+            <span class="reg-name">RCC_APB1ENR</span>
+            <span class="reg-addr">0x40023840 &nbsp;(offset 0x40)</span>
+          </div>
+          <div class="reg-body">
+            <span class="rbit">Bit 19</span> = <span class="rv">1</span> &nbsp;<span class="rcmt">// UART4EN — enable UART4 clock</span><br>
+            <span class="rcmt">Reset value: 0x0000 0000</span>
+          </div>
+        </div>
+        <pre class="codeblock"><span class="cm">/* Always read back after enabling a clock — flushes the APB pipeline */</span>
+RCC_AHB1ENR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">0</span>);   <span class="cm">// GPIOAEN</span>
+(void)RCC_AHB1ENR;
+
+RCC_APB1ENR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">19</span>);  <span class="cm">// UART4EN</span>
+(void)RCC_APB1ENR;</pre>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">2</div></div>
+      <div class="step-content">
+        <div class="step-title">Configure GPIO Pins → Alternate Function Mode</div>
+        <div class="step-why">
+          <strong>Why?</strong> By default, all GPIO pins are plain digital inputs.
+          To make PA0 become a UART TX line, you must point it to AF8 (Alternate Function 8 = UART4).
+          The MCU will then route the UART4 transmitter to the physical pad automatically.
+          <strong>Configure all registers before setting MODER to AF — this prevents glitches.</strong>
+        </div>
+        <div class="callout info" style="margin-bottom:.8rem">
+          <div class="callout-icon">📌</div>
+          <div>PA0 and PA1 both use <strong>AF8</strong> for UART4. AFRL covers pins 0–7 (4 bits each).<br>
+          Correct order: OTYPER → OSPEEDR → PUPDR → AFRL → <strong>MODER last</strong>.</div>
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">GPIOA Registers</span><span class="reg-addr">Base: 0x4002 0000</span></div>
+          <div class="reg-body">
+            <span class="rb">MODER</span>  <span class="reg-addr">+0x00</span> &nbsp; PA0[1:0]=<span class="rv">10</span>, PA1[3:2]=<span class="rv">10</span> &nbsp;<span class="rcmt">// Alternate Function</span><br>
+            <span class="rb">OTYPER</span> <span class="reg-addr">+0x04</span> &nbsp; bit0=<span class="rv">0</span>, bit1=<span class="rv">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rcmt">// Push-Pull</span><br>
+            <span class="rb">OSPEEDR</span><span class="reg-addr">+0x08</span> &nbsp; PA0[1:0]=<span class="rv">00</span>, PA1[3:2]=<span class="rv">00</span> &nbsp;<span class="rcmt">// Low Speed</span><br>
+            <span class="rb">PUPDR</span>  <span class="reg-addr">+0x0C</span> &nbsp; PA0[1:0]=<span class="rv">01</span>, PA1[3:2]=<span class="rv">01</span> &nbsp;<span class="rcmt">// Pull-Up</span><br>
+            <span class="rb">AFRL</span>   <span class="reg-addr">+0x20</span> &nbsp; [3:0]=<span class="rv">1000</span>(AF8), [7:4]=<span class="rv">1000</span>(AF8) <span class="rcmt">// UART4</span>
+          </div>
+        </div>
+        <pre class="codeblock"><span class="cm">/* ---- PA0 TX ---- */</span>
+GPIOA_OTYPER  &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">0</span>);               <span class="cm">// Push-Pull</span>
+GPIOA_OSPEEDR &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">0</span>);               <span class="cm">// Low Speed</span>
+GPIOA_PUPDR   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">0</span>); GPIOA_PUPDR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">0</span>); <span class="cm">// Pull-Up</span>
+GPIOA_AFRL    &amp;= ~(<span class="vl">0xF</span>UL &lt;&lt; <span class="vl">0</span>); GPIOA_AFRL |= (<span class="vl">8</span>UL &lt;&lt; <span class="vl">0</span>); <span class="cm">// AF8</span>
+GPIOA_MODER   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">0</span>); GPIOA_MODER |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">0</span>); <span class="cm">// AF mode last</span>
+
+<span class="cm">/* ---- PA1 RX ---- */</span>
+GPIOA_OTYPER  &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">1</span>);
+GPIOA_OSPEEDR &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">2</span>);
+GPIOA_PUPDR   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">2</span>); GPIOA_PUPDR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">2</span>);
+GPIOA_AFRL    &amp;= ~(<span class="vl">0xF</span>UL &lt;&lt; <span class="vl">4</span>); GPIOA_AFRL |= (<span class="vl">8</span>UL &lt;&lt; <span class="vl">4</span>);
+GPIOA_MODER   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">2</span>); GPIOA_MODER |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">2</span>);</pre>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">3</div></div>
+      <div class="step-content">
+        <div class="step-title">Configure the UART4 Peripheral Registers</div>
+        <div class="step-why">
+          <strong>Why?</strong> Now that the GPIO is set up, configure the UART4 engine itself:
+          how fast to communicate (baud rate), how many data bits, how many stop bits, and whether to use parity checking.
+          Always configure these <em>before</em> enabling UART (UE bit).
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">UART4 Registers</span><span class="reg-addr">Base: 0x4000 4C00</span></div>
+          <div class="reg-body">
+            <span class="rb">SR</span>  <span class="reg-addr">+0x00</span> &nbsp;<span class="rcmt">// Status — read to check TXE, RXNE, errors</span><br>
+            <span class="rb">DR</span>  <span class="reg-addr">+0x04</span> &nbsp;<span class="rcmt">// Data   — write=TX byte, read=RX byte</span><br>
+            <span class="rb">BRR</span> <span class="reg-addr">+0x08</span> &nbsp;= <span class="rv">138</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="rcmt">// 16 000 000 / 115200</span><br>
+            <span class="rb">CR1</span> <span class="reg-addr">+0x0C</span> &nbsp;: M=<span class="rv">0</span>(8bit), PCE=<span class="rv">0</span>, TE=<span class="rv">1</span>, RE=<span class="rv">1</span>, UE=<span class="rv">1</span>(last)<br>
+            <span class="rb">CR2</span> <span class="reg-addr">+0x10</span> &nbsp;: STOP[13:12]=<span class="rv">00</span> &nbsp;<span class="rcmt">// 1 stop bit</span><br>
+            <span class="rb">CR3</span> <span class="reg-addr">+0x14</span> &nbsp;: RTSE=<span class="rv">0</span>, CTSE=<span class="rv">0</span> &nbsp;&nbsp;<span class="rcmt">// no hardware flow control</span>
+          </div>
+        </div>
+        <pre class="codeblock"><span class="cm">/* Step 3a — disable before configuration */</span>
+UART4_CR1 &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">13</span>);   <span class="cm">// UE=0</span>
+
+<span class="cm">/* Step 3b — baud rate */</span>
+UART4_BRR  = <span class="vl">138</span>U;            <span class="cm">// 16 000 000 / 115200 ≈ 138</span>
+
+<span class="cm">/* Step 3c — 1 stop bit (CR2 STOP field = 00) */</span>
+UART4_CR2 &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">12</span>);
+
+<span class="cm">/* Step 3d — no hardware flow control */</span>
+UART4_CR3 &amp;= ~((<span class="vl">1</span>UL &lt;&lt; <span class="vl">8</span>) | (<span class="vl">1</span>UL &lt;&lt; <span class="vl">9</span>));
+
+<span class="cm">/* Step 3e — 8N1: M=0 (8bit), PCE=0 (no parity), TE+RE enabled */</span>
+uint32_t cr1 = 0U;
+cr1 |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">3</span>);            <span class="cm">// TE=1</span>
+cr1 |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">2</span>);            <span class="cm">// RE=1</span>
+UART4_CR1 = cr1;
+
+<span class="cm">/* Step 3f — enable UART last*/</span>
+UART4_CR1 |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">13</span>);    <span class="cm">// UE=1</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">4</div></div>
+      <div class="step-content">
+        <div class="step-title">Initialise SysTick for Millisecond Delays</div>
+        <div class="step-why">
+          <strong>Why?</strong> Your application probably needs to wait (delay) between transmissions.
+          SysTick is a free built-in timer inside the Cortex-M4 core. You set it to tick every 1 ms,
+          and a simple counter gives you <code>delay_ms()</code> without needing an external timer peripheral.
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">SysTick Registers</span><span class="reg-addr">Core PPB — PM0214 §4.4</span></div>
+          <div class="reg-body">
+            <span class="rb">STK_CTRL</span>  <span class="reg-addr">0xE000E010</span> &nbsp;← <span class="rv">0x0</span> then <span class="rv">0x7</span><br>
+            <span class="rb">STK_LOAD</span>  <span class="reg-addr">0xE000E014</span> &nbsp;← <span class="rv">15999</span> &nbsp;<span class="rcmt">// 16MHz/1000-1</span><br>
+            <span class="rb">STK_VAL</span>   <span class="reg-addr">0xE000E018</span> &nbsp;← <span class="rv">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rcmt">// clear counter</span>
+          </div>
+        </div>
+        <pre class="codeblock">STK_CTRL = <span class="vl">0</span>;                         <span class="cm">// disable first</span>
+STK_LOAD = (<span class="vl">16000000</span>UL / <span class="vl">1000</span>U) - <span class="vl">1</span>U; <span class="cm">// 15999</span>
+STK_VAL  = <span class="vl">0</span>;                         <span class="cm">// clear current value</span>
+STK_CTRL = <span class="vl">0x7</span>;  <span class="cm">// CLKSOURCE=1 | TICKINT=1 | ENABLE=1</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">5</div></div>
+      <div class="step-content">
+        <div class="step-title">Transmit and Receive Data</div>
+        <div class="step-why">
+          <strong>How to send a byte:</strong> Wait until SR.TXE=1 (transmit register empty), then write your byte to DR.<br>
+          <strong>How to receive a byte:</strong> Wait until SR.RXNE=1 (received data ready), read DR, then check SR for errors.
+        </div>
+        <pre class="codeblock"><span class="cm">/* --- Transmit one byte --- */</span>
+<span class="kw">void</span> <span class="fn">UART4_SendByte</span>(uint8_t byte) {
+    <span class="kw">while</span> (!(UART4_SR &amp; (<span class="vl">1</span>&lt;&lt;<span class="vl">7</span>)));  <span class="cm">// wait TXE=1</span>
+    UART4_DR = byte;
+}
+
+<span class="cm">/* --- Receive one byte --- */</span>
+uint8_t <span class="fn">UART4_ReadByte</span>(<span class="kw">void</span>) {
+    <span class="kw">while</span> (!(UART4_SR &amp; (<span class="vl">1</span>&lt;&lt;<span class="vl">5</span>)));  <span class="cm">// wait RXNE=1</span>
+    <span class="kw">return</span> (<span class="kw">uint8_t</span>)UART4_DR;
+}
+
+<span class="cm">/* --- Main loop --- */</span>
+<span class="fn">UART4_SendByte</span>(<span class="st">'H'</span>); <span class="fn">UART4_SendByte</span>(<span class="st">'i'</span>); <span class="fn">UART4_SendByte</span>(<span class="st">'\n'</span>);
+<span class="fn">SysTick_DelayMs</span>(<span class="vl">1000</span>);</pre>
+      </div>
+    </div>
+
+  </div><!-- end steps.uart -->
+</section>
+
+<!-- ============================================================
+     SECTION 3 — USART FLOW
+     ============================================================ -->
+<section id="usart-flow">
+  <div class="section-header">
+    <span class="section-badge badge-usart">USART</span>
+    <h2>USART1 Step-by-Step Flow</h2>
+  </div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:2rem">
+    USART1 sits on the <strong style="color:var(--text)">APB2 bus</strong> (faster, up to 84 MHz).
+    It uses <strong style="color:var(--usart)">PA9 (TX)</strong> and <strong style="color:var(--usart)">PA10 (RX)</strong> with <strong style="color:var(--text)">AF7</strong>.
+    The steps are identical to UART except for clock registers and AF number.
+    Optional CK pin (PA8) is covered in Step 3b.
+  </p>
+
+  <div class="steps usart">
+
+    <!-- STEP 1 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">1</div></div>
+      <div class="step-content">
+        <div class="step-title">Enable Peripheral Clocks (RCC)</div>
+        <div class="step-why">
+          <strong>Key difference from UART:</strong> USART1 is on <strong>APB2</strong> (not APB1).
+          Its enable bit is in <code>RCC_APB2ENR</code>, bit 4. The GPIOA clock comes from AHB1 as before.
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">RCC_AHB1ENR</span><span class="reg-addr">0x40023830</span></div>
+          <div class="reg-body"><span class="rbit">Bit 0</span> = <span class="rv">1</span> &nbsp;<span class="rcmt">// GPIOAEN (same as UART)</span></div>
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">RCC_APB2ENR</span><span class="reg-addr">0x40023844 &nbsp;(offset 0x44)</span></div>
+          <div class="reg-body"><span class="rbit">Bit 4</span> = <span class="rv">1</span> &nbsp;<span class="rcmt">// USART1EN — different register &amp; bit from UART4!</span></div>
+        </div>
+        <pre class="codeblock">RCC_AHB1ENR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">0</span>);  <span class="cm">// GPIOAEN</span>
+(void)RCC_AHB1ENR;
+
+RCC_APB2ENR |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">4</span>);  <span class="cm">// USART1EN — APB2, bit 4</span>
+(void)RCC_APB2ENR;</pre>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">2</div></div>
+      <div class="step-content">
+        <div class="step-title">Configure GPIO Pins → AF7 (USART1)</div>
+        <div class="step-why">
+          <strong>Key difference:</strong> USART1 uses <strong>AF7</strong> (not AF8).
+          TX is PA9, RX is PA10. Both need high speed because USART1 runs at up to 84 MHz on APB2.
+          If you use synchronous mode, also configure PA8 as CK output with AF7.
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">GPIOA Registers</span><span class="reg-addr">Base: 0x4002 0000</span></div>
+          <div class="reg-body">
+            <span class="rb">MODER</span>  &nbsp; PA9[19:18]=<span class="rv">10</span>, PA10[21:20]=<span class="rv">10</span> &nbsp;<span class="rcmt">// AF mode</span><br>
+            <span class="rb">OTYPER</span> &nbsp; bit9=<span class="rv">0</span>, bit10=<span class="rv">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rcmt">// Push-Pull</span><br>
+            <span class="rb">OSPEEDR</span>&nbsp; PA9[19:18]=<span class="rv">10</span>, PA10[21:20]=<span class="rv">10</span> &nbsp;<span class="rcmt">// High Speed</span><br>
+            <span class="rb">PUPDR</span>  &nbsp; PA9[19:18]=<span class="rv">00</span>, PA10[21:20]=<span class="rv">01</span> &nbsp;<span class="rcmt">// TX:None, RX:PU</span><br>
+            <span class="rb">AFRH</span>   &nbsp; PA9[7:4]=<span class="rv">0111</span>(AF7), PA10[11:8]=<span class="rv">0111</span>(AF7)
+          </div>
+        </div>
+        <pre class="codeblock"><span class="cm">/* PA9 = TX, PA10 = RX — both AF7 — AFRH (pins 8-15) */</span>
+
+<span class="cm">/* PA9 TX */</span>
+GPIOA_OTYPER  &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">9</span>);
+GPIOA_OSPEEDR &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">18</span>); GPIOA_OSPEEDR |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">18</span>); <span class="cm">// High</span>
+GPIOA_PUPDR   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">18</span>);                                   <span class="cm">// No pull</span>
+GPIOA_AFRH    &amp;= ~(<span class="vl">0xF</span>UL &lt;&lt; <span class="vl">4</span>); GPIOA_AFRH |= (<span class="vl">7</span>UL &lt;&lt; <span class="vl">4</span>);      <span class="cm">// AF7</span>
+GPIOA_MODER   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">18</span>); GPIOA_MODER |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">18</span>);    <span class="cm">// AF last</span>
+
+<span class="cm">/* PA10 RX */</span>
+GPIOA_OTYPER  &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">10</span>);
+GPIOA_OSPEEDR &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">20</span>); GPIOA_OSPEEDR |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">20</span>);
+GPIOA_PUPDR   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">20</span>); GPIOA_PUPDR   |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">20</span>); <span class="cm">// PU on RX</span>
+GPIOA_AFRH    &amp;= ~(<span class="vl">0xF</span>UL &lt;&lt; <span class="vl">8</span>); GPIOA_AFRH |= (<span class="vl">7</span>UL &lt;&lt; <span class="vl">8</span>);
+GPIOA_MODER   &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">20</span>); GPIOA_MODER |= (<span class="vl">2</span>UL &lt;&lt; <span class="vl">20</span>);</pre>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">3</div></div>
+      <div class="step-content">
+        <div class="step-title">Configure the USART1 Peripheral Registers</div>
+        <div class="step-why">
+          <strong>Key difference:</strong> USART1 clock from APB2 = 84 MHz (when PLL is running).
+          At 16 MHz HSI (default), APB2 = 16 MHz — same as APB1 for UART4.
+          USART also has CR2.CLKEN (synchronous CK enable), CR2.CPHA, CR2.CPOL — not available on pure UART.
+        </div>
+        <div class="reg-box">
+          <div class="reg-box-hdr"><span class="reg-name">USART1 Registers</span><span class="reg-addr">Base: 0x4001 1000</span></div>
+          <div class="reg-body">
+            <span class="rb">SR</span>  <span class="reg-addr">+0x00</span> &nbsp;<span class="rcmt">// Status: TXE[7], RXNE[5], TC[6], ORE[3]</span><br>
+            <span class="rb">DR</span>  <span class="reg-addr">+0x04</span> &nbsp;<span class="rcmt">// Data register</span><br>
+            <span class="rb">BRR</span> <span class="reg-addr">+0x08</span> &nbsp;= <span class="rv">138</span> &nbsp;<span class="rcmt">// 16 MHz HSI / 115200</span><br>
+            <span class="rb">CR1</span> <span class="reg-addr">+0x0C</span> &nbsp;: OVER8=<span class="rv">0</span>(16x), M=<span class="rv">0</span>, PCE=<span class="rv">0</span>, TE=<span class="rv">1</span>, RE=<span class="rv">1</span>, UE=<span class="rv">1</span><br>
+            <span class="rb">CR2</span> <span class="reg-addr">+0x10</span> &nbsp;: STOP=<span class="rv">00</span>, CLKEN=<span class="rv">0</span> &nbsp;<span class="rcmt">// async mode (CLKEN=0)</span><br>
+            <span class="rb">CR3</span> <span class="reg-addr">+0x14</span> &nbsp;: RTSE=<span class="rv">0</span>, CTSE=<span class="rv">0</span>
+          </div>
+        </div>
+        <div class="callout tip" style="margin:.6rem 0">
+          <div class="callout-icon">✅</div>
+          <div><strong>USART-only feature — Synchronous Mode (CR2.CLKEN=1):</strong><br>
+          Set CLKEN=1 to output a clock on PA8 (CK pin). Useful for clocking a slave device that needs a master clock. UART4/5 cannot do this.</div>
+        </div>
+        <pre class="codeblock">USART1_CR1 &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">13</span>);  <span class="cm">// UE=0 — disable first</span>
+USART1_BRR  = <span class="vl">138</span>U;           <span class="cm">// 16 000 000 / 115200</span>
+USART1_CR2 &amp;= ~(<span class="vl">3</span>UL &lt;&lt; <span class="vl">12</span>); <span class="cm">// 1 stop bit (STOP=00)</span>
+USART1_CR2 &amp;= ~(<span class="vl">1</span>UL &lt;&lt; <span class="vl">11</span>); <span class="cm">// CLKEN=0 (async mode)</span>
+USART1_CR3 &amp;= ~((<span class="vl">1</span>&lt;&lt;<span class="vl">8</span>)|(<span class="vl">1</span>&lt;&lt;<span class="vl">9</span>));  <span class="cm">// no flow control</span>
+
+uint32_t cr1 = (<span class="vl">1</span>UL&lt;&lt;<span class="vl">3</span>) | (<span class="vl">1</span>UL&lt;&lt;<span class="vl">2</span>);  <span class="cm">// TE=1 RE=1</span>
+USART1_CR1 = cr1;
+USART1_CR1 |= (<span class="vl">1</span>UL &lt;&lt; <span class="vl">13</span>);  <span class="cm">// UE=1 — enable last</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-row">
+      <div class="step-num"><div class="step-circle">4</div></div>
+      <div class="step-content">
+        <div class="step-title">SysTick Init &amp; Transmit / Receive</div>
+        <div class="step-why">
+          <strong>Identical to UART.</strong> Same SysTick setup. Same polling loop on SR.TXE / SR.RXNE. Just change the register names.
+        </div>
+        <pre class="codeblock"><span class="cm">/* Transmit */</span>
+<span class="kw">while</span> (!(USART1_SR &amp; (<span class="vl">1</span>&lt;&lt;<span class="vl">7</span>)));  <span class="cm">// TXE=1</span>
+USART1_DR = <span class="st">'A'</span>;
+
+<span class="cm">/* Receive */</span>
+<span class="kw">while</span> (!(USART1_SR &amp; (<span class="vl">1</span>&lt;&lt;<span class="vl">5</span>)));  <span class="cm">// RXNE=1</span>
+uint8_t b = (uint8_t)USART1_DR;
+
+<span class="cm">/* Delay */</span>
+<span class="fn">SysTick_DelayMs</span>(<span class="vl">1000</span>);</pre>
+      </div>
+    </div>
+
+  </div><!-- end steps.usart -->
+</section>
+
+<!-- ============================================================
+     SECTION 4 — COMPARISON
+     ============================================================ -->
+<section id="compare">
+  <div class="section-header">
+    <span class="section-badge badge-cmp">Compare</span>
+    <h2>UART vs USART — Side by Side</h2>
+  </div>
+
+  <div class="cmp-grid">
+    <div class="cmp-hdr lbl">Feature</div>
+    <div class="cmp-hdr uart">🔶 UART (4/5)</div>
+    <div class="cmp-hdr usart">🔷 USART (1/2/3/6)</div>
+
+    <div class="cmp-cell label">Communication Mode</div>
+    <div class="cmp-cell">Async only</div>
+    <div class="cmp-cell">Async <span class="pill pill-y">+ Sync</span></div>
+
+    <div class="cmp-cell label">Clock Pin (CK)</div>
+    <div class="cmp-cell"><span class="pill pill-n">No</span></div>
+    <div class="cmp-cell"><span class="pill pill-y">Optional (CR2.CLKEN=1)</span></div>
+
+    <div class="cmp-cell label">Alternate Function</div>
+    <div class="cmp-cell">AF8</div>
+    <div class="cmp-cell">AF7 (USART1/2/3) &nbsp;AF8 (USART6)</div>
+
+    <div class="cmp-cell label">Bus</div>
+    <div class="cmp-cell"><span class="pill pill-p">APB1 (max 42 MHz)</span></div>
+    <div class="cmp-cell"><span class="pill pill-p">APB2 (USART1/6 → 84 MHz)</span> APB1 (USART2/3)</div>
+
+    <div class="cmp-cell label">RCC Enable Register</div>
+    <div class="cmp-cell">RCC_APB1ENR</div>
+    <div class="cmp-cell">RCC_APB2ENR (USART1/6) · RCC_APB1ENR (2/3)</div>
+
+    <div class="cmp-cell label">Max Baud @ PLL 84 MHz</div>
+    <div class="cmp-cell">~10.5 Mbaud</div>
+    <div class="cmp-cell">~21 Mbaud (USART1/6)</div>
+
+    <div class="cmp-cell label">Hardware Flow Control</div>
+    <div class="cmp-cell">UART4: <span class="pill pill-n">No</span> &nbsp;UART5: <span class="pill pill-n">No</span></div>
+    <div class="cmp-cell">USART1/2/3/6: <span class="pill pill-y">RTS/CTS (CR3)</span></div>
+
+    <div class="cmp-cell label">LIN Mode</div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR2.LINEN)</span></div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR2.LINEN)</span></div>
+
+    <div class="cmp-cell label">IrDA Mode</div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR3.IREN)</span></div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR3.IREN)</span></div>
+
+    <div class="cmp-cell label">Smartcard Mode</div>
+    <div class="cmp-cell"><span class="pill pill-n">No</span></div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR3.SCEN)</span></div>
+
+    <div class="cmp-cell label">DMA Support</div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR3.DMAR/DMAT)</span></div>
+    <div class="cmp-cell"><span class="pill pill-y">Yes (CR3.DMAR/DMAT)</span></div>
+
+    <div class="cmp-cell label">Typical Use Case</div>
+    <div class="cmp-cell">GPS, GSM, simple sensors</div>
+    <div class="cmp-cell">Debug terminal, Bluetooth, high-speed sync comms</div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5 — PIN MAP
+     ============================================================ -->
+<section id="pins">
+  <div class="section-header">
+    <span class="section-badge badge-ref">Pin Map</span>
+    <h2>All STM32F4 UART / USART Pins</h2>
+  </div>
+
+  <div class="callout info" style="margin-bottom:1.5rem">
+    <div class="callout-icon">📌</div>
+    <div>Each UART/USART can be mapped to multiple GPIO pins (alternate pin mapping). The table shows the most common pinout. Always verify against your specific MCU datasheet's Alternate Function table.</div>
+  </div>
+
+  <div style="overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)">
+  <table class="pin-table">
+    <thead>
+      <tr>
+        <th>Peripheral</th><th>TX Pin</th><th>RX Pin</th><th>CK Pin</th>
+        <th>AF</th><th>Bus</th><th>RCC Enable Bit</th><th>Base Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--uart);font-weight:600">UART4</td>
+        <td>PA0 / PC10</td><td>PA1 / PC11</td><td style="color:var(--subtle)">—</td>
+        <td><span class="tag-af8">AF8</span></td>
+        <td><span class="tag-apb1">APB1</span></td>
+        <td>APB1ENR bit 19</td><td>0x4000 4C00</td>
+      </tr>
+      <tr>
+        <td style="color:var(--uart);font-weight:600">UART5</td>
+        <td>PC12</td><td>PD2</td><td style="color:var(--subtle)">—</td>
+        <td><span class="tag-af8">AF8</span></td>
+        <td><span class="tag-apb1">APB1</span></td>
+        <td>APB1ENR bit 20</td><td>0x4000 5000</td>
+      </tr>
+      <tr>
+        <td style="color:var(--usart);font-weight:600">USART1</td>
+        <td>PA9 / PB6</td><td>PA10 / PB7</td><td>PA8</td>
+        <td><span class="tag-af7">AF7</span></td>
+        <td><span class="tag-apb2">APB2</span></td>
+        <td>APB2ENR bit 4</td><td>0x4001 1000</td>
+      </tr>
+      <tr>
+        <td style="color:var(--usart);font-weight:600">USART2</td>
+        <td>PA2 / PD5</td><td>PA3 / PD6</td><td>PA4 / PD7</td>
+        <td><span class="tag-af7">AF7</span></td>
+        <td><span class="tag-apb1">APB1</span></td>
+        <td>APB1ENR bit 17</td><td>0x4000 4400</td>
+      </tr>
+      <tr>
+        <td style="color:var(--usart);font-weight:600">USART3</td>
+        <td>PB10 / PC10</td><td>PB11 / PC11</td><td>PB12</td>
+        <td><span class="tag-af7">AF7</span></td>
+        <td><span class="tag-apb1">APB1</span></td>
+        <td>APB1ENR bit 18</td><td>0x4000 4800</td>
+      </tr>
+      <tr>
+        <td style="color:var(--usart);font-weight:600">USART6</td>
+        <td>PC6 / PG14</td><td>PC7 / PG9</td><td>PC8</td>
+        <td><span class="tag-af8">AF8</span></td>
+        <td><span class="tag-apb2">APB2</span></td>
+        <td>APB2ENR bit 5</td><td>0x4001 1400</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 6 — QUICK REFERENCE
+     ============================================================ -->
+<section id="quickref">
+  <div class="section-header">
+    <span class="section-badge badge-ref">Quick Ref</span>
+    <h2>Cheat Sheet — Common Operations</h2>
+  </div>
+
+  <div class="qr-grid">
+
+    <div class="qr-card">
+      <div class="qr-card-hdr uart">🔶 UART4 — BRR Formula</div>
+<pre><span class="cm">// BRR = fCK / baud  (OVER8=0, 16x oversampling)</span>
+<span class="cm">// fCK = APB1 clock frequency</span>
+
+115200 baud @ 16 MHz : BRR = 138
+9600   baud @ 16 MHz : BRR = 1666
+115200 baud @ 42 MHz : BRR = 364
+115200 baud @ 84 MHz : BRR = 729</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr usart">🔷 USART1 — BRR Formula</div>
+<pre><span class="cm">// APB2 clock (84 MHz with PLL)</span>
+
+115200 baud @ 16 MHz : BRR = 138
+115200 baud @ 84 MHz : BRR = 729
+1 Mbaud    @ 84 MHz : BRR = 84
+9600 baud  @ 84 MHz : BRR = 8750</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr gen">SR Flag Bits (both UART &amp; USART)</div>
+<pre>SR bit 7  = TXE   TX register empty
+SR bit 6  = TC    Transmission complete
+SR bit 5  = RXNE  RX data ready to read
+SR bit 3  = ORE   Overrun error
+SR bit 1  = FE    Framing error
+SR bit 0  = PE    Parity error</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr gen">CR1 Key Bits</div>
+<pre>bit 15 = OVER8  0=16x oversampling (default)
+bit 13 = UE     UART Enable (set LAST)
+bit 12 = M      Word: 0=8bit, 1=9bit
+bit 10 = PCE    Parity enable
+bit  9 = PS     0=even, 1=odd parity
+bit  3 = TE     Transmitter enable
+bit  2 = RE     Receiver enable</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr gen">CR2 Key Bits (USART extra)</div>
+<pre>bits[13:12] = STOP   00=1bit, 10=2bits
+bit 11      = CLKEN  CK pin enable (USART only)
+bit 10      = CPOL   Clock polarity (sync)
+bit  9      = CPHA   Clock phase (sync)
+bit  8      = LBCL   Last bit clock (sync)</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr gen">CR3 Key Bits</div>
+<pre>bit 11 = ONEBIT  1-sample bit method
+bit  9 = CTSE    CTS flow control
+bit  8 = RTSE    RTS flow control
+bit  7 = DMAT    DMA transmit enable
+bit  6 = DMAR    DMA receive enable
+bit  3 = HDSEL   Half-duplex mode
+bit  1 = IREN    IrDA mode enable</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr uart">🔶 UART4 Init Checklist</div>
+<pre>☐ RCC_APB1ENR |= (1&lt;&lt;19)  UART4EN
+☐ RCC_AHB1ENR |= (1&lt;&lt;0)   GPIOAEN
+☐ PA0 → AF8, PP, Low, PU  TX
+☐ PA1 → AF8, PP, Low, PU  RX
+☐ CR1 : UE=0 (disable)
+☐ BRR  = fCK / baud
+☐ CR2  : STOP=00
+☐ CR3  : flow=off
+☐ CR1  : 8N1, TE=1, RE=1
+☐ CR1  : UE=1  ← last!</pre>
+    </div>
+
+    <div class="qr-card">
+      <div class="qr-card-hdr usart">🔷 USART1 Init Checklist</div>
+<pre>☐ RCC_APB2ENR |= (1&lt;&lt;4)   USART1EN
+☐ RCC_AHB1ENR |= (1&lt;&lt;0)   GPIOAEN
+☐ PA9  → AF7, PP, High, None  TX
+☐ PA10 → AF7, PP, High, PU    RX
+☐ CR1  : UE=0 (disable)
+☐ BRR   = fCK / baud
+☐ CR2  : STOP=00, CLKEN=0
+☐ CR3  : flow=off
+☐ CR1  : 8N1, TE=1, RE=1
+☐ CR1  : UE=1  ← last!</pre>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  STM32F4 UART / USART Bare-Metal Production Guide &nbsp;·&nbsp;
+  RM0090 Rev 19 &nbsp;·&nbsp; PM0214 Rev 10 &nbsp;·&nbsp;
+  EMBEDDED_ROADMAP / UART_HI
+</footer>
+
+</body>
+</html>

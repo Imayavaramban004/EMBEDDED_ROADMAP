@@ -38,7 +38,7 @@ int main(void)
     }
 
     /* Drive the LED high */
-    status = GPIO_WritePin(&LED_PA5, GPIO_PIN_SET);
+    status = GPIO_WritePin(&LED_PA5, GPIO_PIN_RESET);
     if (status != GPIO_OK) {
         Error_Handler(status);
     }

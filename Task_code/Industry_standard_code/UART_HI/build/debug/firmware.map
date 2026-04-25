@@ -1,0 +1,650 @@
+
+Discarded input sections
+
+ .group         0x00000000        0xc build/debug/main.o
+ .group         0x00000000        0xc build/debug/main.o
+ .group         0x00000000        0xc build/debug/main.o
+ .group         0x00000000        0xc build/debug/main.o
+ .group         0x00000000        0xc build/debug/main.o
+ .group         0x00000000        0xc build/debug/main.o
+ .text          0x00000000        0x0 build/debug/main.o
+ .data          0x00000000        0x0 build/debug/main.o
+ .bss           0x00000000        0x0 build/debug/main.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_gpio.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_gpio.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_gpio.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_gpio.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_gpio.o
+ .text          0x00000000        0x0 build/debug/stm32f4xx_gpio.o
+ .data          0x00000000        0x0 build/debug/stm32f4xx_gpio.o
+ .bss           0x00000000        0x0 build/debug/stm32f4xx_gpio.o
+ .text.GPIO_WritePin
+                0x00000000       0x5c build/debug/stm32f4xx_gpio.o
+ .text.GPIO_ReadPin
+                0x00000000       0x5e build/debug/stm32f4xx_gpio.o
+ .text.GPIO_TogglePin
+                0x00000000       0x6c build/debug/stm32f4xx_gpio.o
+ .text.GPIO_DeInit
+                0x00000000       0x88 build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x00000000      0xad2 build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x00000000      0x34e build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x00000000      0x190 build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x00000000      0x225 build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x00000000      0x1ab build/debug/stm32f4xx_gpio.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_rcc.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_rcc.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_rcc.o
+ .text          0x00000000        0x0 build/debug/stm32f4xx_rcc.o
+ .data          0x00000000        0x0 build/debug/stm32f4xx_rcc.o
+ .bss           0x00000000        0x0 build/debug/stm32f4xx_rcc.o
+ .text.rcc_wait_for_clock_source
+                0x00000000       0x44 build/debug/stm32f4xx_rcc.o
+ .text.RCC_AHB1ClockEnable
+                0x00000000       0x2c build/debug/stm32f4xx_rcc.o
+ .text.RCC_AHB1ClockDisable
+                0x00000000       0x28 build/debug/stm32f4xx_rcc.o
+ .text.RCC_APB1ClockEnable
+                0x00000000       0x2c build/debug/stm32f4xx_rcc.o
+ .text.RCC_APB1ClockDisable
+                0x00000000       0x28 build/debug/stm32f4xx_rcc.o
+ .text.RCC_APB2ClockEnable
+                0x00000000       0x2c build/debug/stm32f4xx_rcc.o
+ .text.RCC_APB2ClockDisable
+                0x00000000       0x28 build/debug/stm32f4xx_rcc.o
+ .text.RCC_SetSysClockSource
+                0x00000000       0x40 build/debug/stm32f4xx_rcc.o
+ .text.RCC_GetSysClockSource
+                0x00000000       0x1c build/debug/stm32f4xx_rcc.o
+ .text.SysTick_GetTick
+                0x00000000       0x18 build/debug/stm32f4xx_rcc.o
+ .debug_macro   0x00000000      0xad2 build/debug/stm32f4xx_rcc.o
+ .debug_macro   0x00000000      0x34e build/debug/stm32f4xx_rcc.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/stm32f4xx_uart.o
+ .text          0x00000000        0x0 build/debug/stm32f4xx_uart.o
+ .data          0x00000000        0x0 build/debug/stm32f4xx_uart.o
+ .bss           0x00000000        0x0 build/debug/stm32f4xx_uart.o
+ .text.UART_Transmit
+                0x00000000       0x58 build/debug/stm32f4xx_uart.o
+ .text.UART_ReceiveByte
+                0x00000000       0xac build/debug/stm32f4xx_uart.o
+ .text.UART_Receive
+                0x00000000       0x56 build/debug/stm32f4xx_uart.o
+ .text.UART_DeInit
+                0x00000000       0x8e build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0xad2 build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0x34e build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0x190 build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0x225 build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0x1ab build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00000000      0x281 build/debug/stm32f4xx_uart.o
+ .group         0x00000000        0xc build/debug/startup_f446re.o
+ .group         0x00000000        0xc build/debug/startup_f446re.o
+ .group         0x00000000        0xc build/debug/startup_f446re.o
+ .text          0x00000000        0x0 build/debug/startup_f446re.o
+ .data          0x00000000        0x0 build/debug/startup_f446re.o
+ .bss           0x00000000        0x0 build/debug/startup_f446re.o
+ .debug_macro   0x00000000      0xad2 build/debug/startup_f446re.o
+ .debug_macro   0x00000000      0x34e build/debug/startup_f446re.o
+ .debug_macro   0x00000000      0x190 build/debug/startup_f446re.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00020000         xrw
+BAKSRAM          0x40024000         0x00004000         rw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a
+LOAD build/debug/main.o
+LOAD build/debug/stm32f4xx_gpio.o
+LOAD build/debug/stm32f4xx_rcc.o
+LOAD build/debug/stm32f4xx_uart.o
+LOAD build/debug/startup_f446re.o
+START GROUP
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard\libgcc.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a
+END GROUP
+START GROUP
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard\libgcc.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libnosys.a
+END GROUP
+START GROUP
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard\libgcc.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libnosys.a
+END GROUP
+                0x00000400                        _Min_Heap_Size = 0x400
+                0x00000800                        _Min_Stack_Size = 0x800
+
+.isr_vector     0x08000000      0x1c4
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1c4 build/debug/startup_f446re.o
+                0x08000000                vector_table
+                0x080001c4                        . = ALIGN (0x4)
+
+.text           0x080001c4      0x704
+                0x080001c4                        . = ALIGN (0x4)
+                0x080001c4                        _stext = .
+ *(.text)
+ *(.text*)
+ .text.Error_Handler
+                0x080001c4        0x8 build/debug/main.o
+ .text.main     0x080001cc       0x9c build/debug/main.o
+                0x080001cc                main
+ .text.gpio_validate_config
+                0x08000268       0x74 build/debug/stm32f4xx_gpio.o
+ .text.gpio_set_2bit_field
+                0x080002dc       0x44 build/debug/stm32f4xx_gpio.o
+ .text.gpio_set_af
+                0x08000320       0x62 build/debug/stm32f4xx_gpio.o
+ *fill*         0x08000382        0x2 
+ .text.GPIO_Init
+                0x08000384      0x114 build/debug/stm32f4xx_gpio.o
+                0x08000384                GPIO_Init
+ .text.SysTick_Init
+                0x08000498       0x50 build/debug/stm32f4xx_rcc.o
+                0x08000498                SysTick_Init
+ .text.SysTick_DelayMs
+                0x080004e8       0x34 build/debug/stm32f4xx_rcc.o
+                0x080004e8                SysTick_DelayMs
+ .text.SysTick_Handler
+                0x0800051c       0x1c build/debug/stm32f4xx_rcc.o
+                0x0800051c                SysTick_Handler
+ .text.uart_validate_config
+                0x08000538       0x78 build/debug/stm32f4xx_uart.o
+ .text.uart_reg
+                0x080005b0       0x1c build/debug/stm32f4xx_uart.o
+ .text.UART_Init
+                0x080005cc      0x19a build/debug/stm32f4xx_uart.o
+                0x080005cc                UART_Init
+ *fill*         0x08000766        0x2 
+ .text.UART_TransmitByte
+                0x08000768       0x78 build/debug/stm32f4xx_uart.o
+                0x08000768                UART_TransmitByte
+ .text.UART_TransmitString
+                0x080007e0       0x4c build/debug/stm32f4xx_uart.o
+                0x080007e0                UART_TransmitString
+ .text.SystemInit
+                0x0800082c        0xe build/debug/startup_f446re.o
+                0x0800082c                SystemInit
+ *fill*         0x0800083a        0x2 
+ .text.Reset_Handler
+                0x0800083c       0x84 build/debug/startup_f446re.o
+                0x0800083c                Reset_Handler
+ .text.Default_Handler
+                0x080008c0        0x8 build/debug/startup_f446re.o
+                0x080008c0                RTC_Alarm_IRQHandler
+                0x080008c0                EXTI2_IRQHandler
+                0x080008c0                TIM8_CC_IRQHandler
+                0x080008c0                DebugMon_Handler
+                0x080008c0                FMPI2C1_EV_IRQHandler
+                0x080008c0                SPI4_IRQHandler
+                0x080008c0                TIM1_CC_IRQHandler
+                0x080008c0                QuadSPI_IRQHandler
+                0x080008c0                DMA2_Stream5_IRQHandler
+                0x080008c0                HardFault_Handler
+                0x080008c0                DMA1_Stream5_IRQHandler
+                0x080008c0                PVD_IRQHandler
+                0x080008c0                SDIO_IRQHandler
+                0x080008c0                TAMP_STAMP_IRQHandler
+                0x080008c0                PendSV_Handler
+                0x080008c0                NMI_Handler
+                0x080008c0                CAN2_RX1_IRQHandler
+                0x080008c0                EXTI3_IRQHandler
+                0x080008c0                TIM8_TRG_COM_TIM14_IRQHandler
+                0x080008c0                TIM1_UP_TIM10_IRQHandler
+                0x080008c0                TIM8_UP_TIM13_IRQHandler
+                0x080008c0                I2C3_ER_IRQHandler
+                0x080008c0                EXTI0_IRQHandler
+                0x080008c0                I2C2_EV_IRQHandler
+                0x080008c0                DMA1_Stream2_IRQHandler
+                0x080008c0                CAN1_RX0_IRQHandler
+                0x080008c0                FPU_IRQHandler
+                0x080008c0                OTG_HS_WKUP_IRQHandler
+                0x080008c0                UsageFault_Handler
+                0x080008c0                CAN2_SCE_IRQHandler
+                0x080008c0                DMA2_Stream2_IRQHandler
+                0x080008c0                SPI1_IRQHandler
+                0x080008c0                TIM6_DAC_IRQHandler
+                0x080008c0                TIM1_BRK_TIM9_IRQHandler
+                0x080008c0                DCMI_IRQHandler
+                0x080008c0                CAN2_RX0_IRQHandler
+                0x080008c0                DMA2_Stream3_IRQHandler
+                0x080008c0                SAI2_IRQHandler
+                0x080008c0                USART6_IRQHandler
+                0x080008c0                USART3_IRQHandler
+                0x080008c0                CAN1_RX1_IRQHandler
+                0x080008c0                UART5_IRQHandler
+                0x080008c0                DMA2_Stream0_IRQHandler
+                0x080008c0                TIM4_IRQHandler
+                0x080008c0                I2C1_EV_IRQHandler
+                0x080008c0                HDMI_CEC_IRQHandler
+                0x080008c0                DMA1_Stream6_IRQHandler
+                0x080008c0                DMA1_Stream1_IRQHandler
+                0x080008c0                UART4_IRQHandler
+                0x080008c0                TIM3_IRQHandler
+                0x080008c0                RCC_IRQHandler
+                0x080008c0                TIM8_BRK_TIM12_IRQHandler
+                0x080008c0                Default_Handler
+                0x080008c0                EXTI15_10_IRQHandler
+                0x080008c0                ADC_IRQHandler
+                0x080008c0                DMA1_Stream7_IRQHandler
+                0x080008c0                TIM7_IRQHandler
+                0x080008c0                CAN2_TX_IRQHandler
+                0x080008c0                TIM5_IRQHandler
+                0x080008c0                DMA2_Stream7_IRQHandler
+                0x080008c0                I2C3_EV_IRQHandler
+                0x080008c0                EXTI9_5_IRQHandler
+                0x080008c0                RTC_WKUP_IRQHandler
+                0x080008c0                SPDIF_RX_IRQHandler
+                0x080008c0                SPI2_IRQHandler
+                0x080008c0                OTG_HS_EP1_IN_IRQHandler
+                0x080008c0                MemManage_Handler
+                0x080008c0                DMA1_Stream0_IRQHandler
+                0x080008c0                CAN1_TX_IRQHandler
+                0x080008c0                SVC_Handler
+                0x080008c0                FMPI2C1_ER_IRQHandler
+                0x080008c0                EXTI4_IRQHandler
+                0x080008c0                FSMC_IRQHandler
+                0x080008c0                OTG_HS_EP1_OUT_IRQHandler
+                0x080008c0                WWDG_IRQHandler
+                0x080008c0                TIM2_IRQHandler
+                0x080008c0                OTG_FS_WKUP_IRQHandler
+                0x080008c0                TIM1_TRG_COM_TIM11_IRQHandler
+                0x080008c0                OTG_HS_IRQHandler
+                0x080008c0                EXTI1_IRQHandler
+                0x080008c0                USART2_IRQHandler
+                0x080008c0                I2C2_ER_IRQHandler
+                0x080008c0                DMA2_Stream1_IRQHandler
+                0x080008c0                CAN1_SCE_IRQHandler
+                0x080008c0                FLASH_IRQHandler
+                0x080008c0                DMA2_Stream4_IRQHandler
+                0x080008c0                BusFault_Handler
+                0x080008c0                USART1_IRQHandler
+                0x080008c0                OTG_FS_IRQHandler
+                0x080008c0                SPI3_IRQHandler
+                0x080008c0                DMA1_Stream4_IRQHandler
+                0x080008c0                I2C1_ER_IRQHandler
+                0x080008c0                DMA2_Stream6_IRQHandler
+                0x080008c0                SAI1_IRQHandler
+                0x080008c0                DMA1_Stream3_IRQHandler
+ *(.init)
+ *(.fini)
+                0x080008c8                        . = ALIGN (0x4)
+                0x080008c8                        _etext = .
+
+.glue_7         0x080008c8        0x0
+ .glue_7        0x080008c8        0x0 linker stubs
+
+.glue_7t        0x080008c8        0x0
+ .glue_7t       0x080008c8        0x0 linker stubs
+
+.vfp11_veneer   0x080008c8        0x0
+ .vfp11_veneer  0x080008c8        0x0 linker stubs
+
+.v4_bx          0x080008c8        0x0
+ .v4_bx         0x080008c8        0x0 linker stubs
+
+.iplt           0x080008c8        0x0
+ .iplt          0x080008c8        0x0 build/debug/main.o
+
+.rodata         0x080008c8       0xbc
+                0x080008c8                        . = ALIGN (0x4)
+ *(.rodata)
+ .rodata        0x080008c8       0x80 build/debug/main.o
+ *(.rodata*)
+ .rodata.UART4_TX_PA0
+                0x08000948       0x10 build/debug/main.o
+ .rodata.UART4_RX_PA1
+                0x08000958       0x10 build/debug/main.o
+ .rodata.UART4_Cfg
+                0x08000968       0x1c build/debug/main.o
+                0x08000984                        . = ALIGN (0x4)
+
+.rel.dyn        0x08000984        0x0
+ .rel.iplt      0x08000984        0x0 build/debug/main.o
+
+.ARM.extab      0x08000984        0x0
+                0x08000984                        . = ALIGN (0x4)
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+                0x08000984                        . = ALIGN (0x4)
+
+.ARM.exidx      0x08000984        0x0
+                0x08000984                        . = ALIGN (0x4)
+                0x08000984                        __exidx_start = .
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+                0x08000984                        __exidx_end = .
+                0x08000984                        . = ALIGN (0x4)
+
+.preinit_array  0x08000984        0x0
+                0x08000984                        . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array*)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+                0x08000984                        . = ALIGN (0x4)
+
+.init_array     0x08000984        0x0
+                0x08000984                        . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array*)
+                [!provide]                        PROVIDE (__init_array_end = .)
+                0x08000984                        . = ALIGN (0x4)
+
+.fini_array     0x08000984        0x0
+                0x08000984                        . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_NAME(.fini_array.*))
+ *(.fini_array*)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+                0x08000984                        . = ALIGN (0x4)
+
+.data           0x20000000        0x0 load address 0x08000984
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ *(.data*)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+                0x08000984                        _lma_data_start = LOADADDR (.data)
+
+.igot.plt       0x20000000        0x0 load address 0x08000984
+ .igot.plt      0x20000000        0x0 build/debug/main.o
+
+.bss            0x20000000        0x4 load address 0x08000984
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ *(.bss*)
+ .bss.s_tick_ms
+                0x20000000        0x4 build/debug/stm32f4xx_rcc.o
+ *(COMMON)
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _ebss = .
+
+.noinit         0x20000004        0x0 load address 0x08000984
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _snoinit = .
+ *(.noinit)
+ *(.noinit*)
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _enoinit = .
+
+.baksram        0x40024000        0x0
+                0x40024000                        . = ALIGN (0x4)
+                0x40024000                        _sbaksram = .
+ *(.baksram)
+ *(.baksram*)
+                0x40024000                        . = ALIGN (0x4)
+                0x40024000                        _ebaksram = .
+
+._user_heap_stack
+                0x20000004      0xc04
+                0x20000008                        . = ALIGN (0x8)
+ *fill*         0x20000004        0x4 
+                0x20000008                        _heap_start = .
+                0x20000408                        . = (. + _Min_Heap_Size)
+ *fill*         0x20000008      0x400 
+                0x20000408                        . = ALIGN (0x8)
+                0x20000408                        _heap_end = .
+                0x20000408                        _stack_end = .
+                0x20000c08                        . = (. + _Min_Stack_Size)
+ *fill*         0x20000408      0x800 
+                0x20000c08                        . = ALIGN (0x8)
+                0x20000c08                        _stack_top = .
+                [!provide]                        PROVIDE (_end = _ebss)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_sstack = _stack_end)
+                0x20000c08                        PROVIDE (_estack = _stack_top)
+
+/DISCARD/
+ libc.a(*)
+ libm.a(*)
+ libgcc.a(*)
+                0x00000001                        ASSERT ((_stack_top <= (ORIGIN (SRAM) + LENGTH (SRAM))), ERROR: Stack + heap overflow SRAM — reduce _Min_Stack_Size or _Min_Heap_Size)
+                0x00000001                        ASSERT ((SIZEOF (.isr_vector) >= 0x188), WARNING: ISR vector table appears too small for STM32F4xx (98 vectors * 4 bytes))
+OUTPUT(build/debug/firmware.elf elf32-littlearm)
+LOAD linker stubs
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a
+LOAD C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard\libgcc.a
+
+.debug_info     0x00000000     0x117a
+ .debug_info    0x00000000      0x359 build/debug/main.o
+ .debug_info    0x00000359      0x4ae build/debug/stm32f4xx_gpio.o
+ .debug_info    0x00000807      0x29a build/debug/stm32f4xx_rcc.o
+ .debug_info    0x00000aa1      0x4ed build/debug/stm32f4xx_uart.o
+ .debug_info    0x00000f8e      0x1ec build/debug/startup_f446re.o
+
+.debug_abbrev   0x00000000      0x664
+ .debug_abbrev  0x00000000      0x138 build/debug/main.o
+ .debug_abbrev  0x00000138      0x159 build/debug/stm32f4xx_gpio.o
+ .debug_abbrev  0x00000291      0x111 build/debug/stm32f4xx_rcc.o
+ .debug_abbrev  0x000003a2      0x18a build/debug/stm32f4xx_uart.o
+ .debug_abbrev  0x0000052c      0x138 build/debug/startup_f446re.o
+
+.debug_aranges  0x00000000      0x190
+ .debug_aranges
+                0x00000000       0x28 build/debug/main.o
+ .debug_aranges
+                0x00000028       0x58 build/debug/stm32f4xx_gpio.o
+ .debug_aranges
+                0x00000080       0x80 build/debug/stm32f4xx_rcc.o
+ .debug_aranges
+                0x00000100       0x60 build/debug/stm32f4xx_uart.o
+ .debug_aranges
+                0x00000160       0x30 build/debug/startup_f446re.o
+
+.debug_ranges   0x00000000      0x140
+ .debug_ranges  0x00000000       0x18 build/debug/main.o
+ .debug_ranges  0x00000018       0x48 build/debug/stm32f4xx_gpio.o
+ .debug_ranges  0x00000060       0x70 build/debug/stm32f4xx_rcc.o
+ .debug_ranges  0x000000d0       0x50 build/debug/stm32f4xx_uart.o
+ .debug_ranges  0x00000120       0x20 build/debug/startup_f446re.o
+
+.debug_macro    0x00000000     0x1993
+ .debug_macro   0x00000000       0x64 build/debug/main.o
+ .debug_macro   0x00000064      0xad2 build/debug/main.o
+ .debug_macro   0x00000b36      0x34e build/debug/main.o
+ .debug_macro   0x00000e84      0x190 build/debug/main.o
+ .debug_macro   0x00001014      0x225 build/debug/main.o
+ .debug_macro   0x00001239      0x1ab build/debug/main.o
+ .debug_macro   0x000013e4      0x281 build/debug/main.o
+ .debug_macro   0x00001665       0x45 build/debug/stm32f4xx_gpio.o
+ .debug_macro   0x000016aa       0x39 build/debug/stm32f4xx_rcc.o
+ .debug_macro   0x000016e3      0x21f build/debug/stm32f4xx_rcc.o
+ .debug_macro   0x00001902       0x5e build/debug/stm32f4xx_uart.o
+ .debug_macro   0x00001960       0x33 build/debug/startup_f446re.o
+
+.debug_line     0x00000000      0xd94
+ .debug_line    0x00000000      0x15b build/debug/main.o
+ .debug_line    0x0000015b      0x3d8 build/debug/stm32f4xx_gpio.o
+ .debug_line    0x00000533      0x28b build/debug/stm32f4xx_rcc.o
+ .debug_line    0x000007be      0x475 build/debug/stm32f4xx_uart.o
+ .debug_line    0x00000c33      0x161 build/debug/startup_f446re.o
+
+.debug_str      0x00000000     0x5f0d
+ .debug_str     0x00000000     0x5f0d build/debug/main.o
+                               0x5cfb (size before relaxing)
+ .debug_str     0x00005f0d     0x5076 build/debug/stm32f4xx_gpio.o
+ .debug_str     0x00005f0d     0x454c build/debug/stm32f4xx_rcc.o
+ .debug_str     0x00005f0d     0x5c85 build/debug/stm32f4xx_uart.o
+ .debug_str     0x00005f0d     0x3d7b build/debug/startup_f446re.o
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 build/debug/main.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046       0x47 build/debug/stm32f4xx_gpio.o
+ .comment       0x00000046       0x47 build/debug/stm32f4xx_rcc.o
+ .comment       0x00000046       0x47 build/debug/stm32f4xx_uart.o
+ .comment       0x00000046       0x47 build/debug/startup_f446re.o
+
+.ARM.attributes
+                0x00000000       0x34
+ .ARM.attributes
+                0x00000000       0x34 build/debug/main.o
+ .ARM.attributes
+                0x00000034       0x34 build/debug/stm32f4xx_gpio.o
+ .ARM.attributes
+                0x00000068       0x34 build/debug/stm32f4xx_rcc.o
+ .ARM.attributes
+                0x0000009c       0x34 build/debug/stm32f4xx_uart.o
+ .ARM.attributes
+                0x000000d0       0x34 build/debug/startup_f446re.o
+
+.debug_frame    0x00000000      0x544
+ .debug_frame   0x00000000       0x44 build/debug/main.o
+ .debug_frame   0x00000044      0x13c build/debug/stm32f4xx_gpio.o
+ .debug_frame   0x00000180      0x1fc build/debug/stm32f4xx_rcc.o
+ .debug_frame   0x0000037c      0x160 build/debug/stm32f4xx_uart.o
+ .debug_frame   0x000004dc       0x68 build/debug/startup_f446re.o
+
+Cross Reference Table
+
+Symbol                                            File
+ADC_IRQHandler                                    build/debug/startup_f446re.o
+BusFault_Handler                                  build/debug/startup_f446re.o
+CAN1_RX0_IRQHandler                               build/debug/startup_f446re.o
+CAN1_RX1_IRQHandler                               build/debug/startup_f446re.o
+CAN1_SCE_IRQHandler                               build/debug/startup_f446re.o
+CAN1_TX_IRQHandler                                build/debug/startup_f446re.o
+CAN2_RX0_IRQHandler                               build/debug/startup_f446re.o
+CAN2_RX1_IRQHandler                               build/debug/startup_f446re.o
+CAN2_SCE_IRQHandler                               build/debug/startup_f446re.o
+CAN2_TX_IRQHandler                                build/debug/startup_f446re.o
+DCMI_IRQHandler                                   build/debug/startup_f446re.o
+DMA1_Stream0_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream1_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream2_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream3_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream4_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream5_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream6_IRQHandler                           build/debug/startup_f446re.o
+DMA1_Stream7_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream0_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream1_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream2_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream3_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream4_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream5_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream6_IRQHandler                           build/debug/startup_f446re.o
+DMA2_Stream7_IRQHandler                           build/debug/startup_f446re.o
+DebugMon_Handler                                  build/debug/startup_f446re.o
+Default_Handler                                   build/debug/startup_f446re.o
+EXTI0_IRQHandler                                  build/debug/startup_f446re.o
+EXTI15_10_IRQHandler                              build/debug/startup_f446re.o
+EXTI1_IRQHandler                                  build/debug/startup_f446re.o
+EXTI2_IRQHandler                                  build/debug/startup_f446re.o
+EXTI3_IRQHandler                                  build/debug/startup_f446re.o
+EXTI4_IRQHandler                                  build/debug/startup_f446re.o
+EXTI9_5_IRQHandler                                build/debug/startup_f446re.o
+FLASH_IRQHandler                                  build/debug/startup_f446re.o
+FMPI2C1_ER_IRQHandler                             build/debug/startup_f446re.o
+FMPI2C1_EV_IRQHandler                             build/debug/startup_f446re.o
+FPU_IRQHandler                                    build/debug/startup_f446re.o
+FSMC_IRQHandler                                   build/debug/startup_f446re.o
+GPIO_DeInit                                       build/debug/stm32f4xx_gpio.o
+GPIO_Init                                         build/debug/stm32f4xx_gpio.o
+                                                  build/debug/main.o
+GPIO_ReadPin                                      build/debug/stm32f4xx_gpio.o
+GPIO_TogglePin                                    build/debug/stm32f4xx_gpio.o
+GPIO_WritePin                                     build/debug/stm32f4xx_gpio.o
+HDMI_CEC_IRQHandler                               build/debug/startup_f446re.o
+HardFault_Handler                                 build/debug/startup_f446re.o
+I2C1_ER_IRQHandler                                build/debug/startup_f446re.o
+I2C1_EV_IRQHandler                                build/debug/startup_f446re.o
+I2C2_ER_IRQHandler                                build/debug/startup_f446re.o
+I2C2_EV_IRQHandler                                build/debug/startup_f446re.o
+I2C3_ER_IRQHandler                                build/debug/startup_f446re.o
+I2C3_EV_IRQHandler                                build/debug/startup_f446re.o
+MemManage_Handler                                 build/debug/startup_f446re.o
+NMI_Handler                                       build/debug/startup_f446re.o
+OTG_FS_IRQHandler                                 build/debug/startup_f446re.o
+OTG_FS_WKUP_IRQHandler                            build/debug/startup_f446re.o
+OTG_HS_EP1_IN_IRQHandler                          build/debug/startup_f446re.o
+OTG_HS_EP1_OUT_IRQHandler                         build/debug/startup_f446re.o
+OTG_HS_IRQHandler                                 build/debug/startup_f446re.o
+OTG_HS_WKUP_IRQHandler                            build/debug/startup_f446re.o
+PVD_IRQHandler                                    build/debug/startup_f446re.o
+PendSV_Handler                                    build/debug/startup_f446re.o
+QuadSPI_IRQHandler                                build/debug/startup_f446re.o
+RCC_AHB1ClockDisable                              build/debug/stm32f4xx_rcc.o
+RCC_AHB1ClockEnable                               build/debug/stm32f4xx_rcc.o
+RCC_APB1ClockDisable                              build/debug/stm32f4xx_rcc.o
+RCC_APB1ClockEnable                               build/debug/stm32f4xx_rcc.o
+RCC_APB2ClockDisable                              build/debug/stm32f4xx_rcc.o
+RCC_APB2ClockEnable                               build/debug/stm32f4xx_rcc.o
+RCC_GetSysClockSource                             build/debug/stm32f4xx_rcc.o
+RCC_IRQHandler                                    build/debug/startup_f446re.o
+RCC_SetSysClockSource                             build/debug/stm32f4xx_rcc.o
+RTC_Alarm_IRQHandler                              build/debug/startup_f446re.o
+RTC_WKUP_IRQHandler                               build/debug/startup_f446re.o
+Reset_Handler                                     build/debug/startup_f446re.o
+SAI1_IRQHandler                                   build/debug/startup_f446re.o
+SAI2_IRQHandler                                   build/debug/startup_f446re.o
+SDIO_IRQHandler                                   build/debug/startup_f446re.o
+SPDIF_RX_IRQHandler                               build/debug/startup_f446re.o
+SPI1_IRQHandler                                   build/debug/startup_f446re.o
+SPI2_IRQHandler                                   build/debug/startup_f446re.o
+SPI3_IRQHandler                                   build/debug/startup_f446re.o
+SPI4_IRQHandler                                   build/debug/startup_f446re.o
+SVC_Handler                                       build/debug/startup_f446re.o
+SysTick_DelayMs                                   build/debug/stm32f4xx_rcc.o
+                                                  build/debug/main.o
+SysTick_GetTick                                   build/debug/stm32f4xx_rcc.o
+SysTick_Handler                                   build/debug/stm32f4xx_rcc.o
+SysTick_Init                                      build/debug/stm32f4xx_rcc.o
+                                                  build/debug/main.o
+SystemInit                                        build/debug/startup_f446re.o
+TAMP_STAMP_IRQHandler                             build/debug/startup_f446re.o
+TIM1_BRK_TIM9_IRQHandler                          build/debug/startup_f446re.o
+TIM1_CC_IRQHandler                                build/debug/startup_f446re.o
+TIM1_TRG_COM_TIM11_IRQHandler                     build/debug/startup_f446re.o
+TIM1_UP_TIM10_IRQHandler                          build/debug/startup_f446re.o
+TIM2_IRQHandler                                   build/debug/startup_f446re.o
+TIM3_IRQHandler                                   build/debug/startup_f446re.o
+TIM4_IRQHandler                                   build/debug/startup_f446re.o
+TIM5_IRQHandler                                   build/debug/startup_f446re.o
+TIM6_DAC_IRQHandler                               build/debug/startup_f446re.o
+TIM7_IRQHandler                                   build/debug/startup_f446re.o
+TIM8_BRK_TIM12_IRQHandler                         build/debug/startup_f446re.o
+TIM8_CC_IRQHandler                                build/debug/startup_f446re.o
+TIM8_TRG_COM_TIM14_IRQHandler                     build/debug/startup_f446re.o
+TIM8_UP_TIM13_IRQHandler                          build/debug/startup_f446re.o
+UART4_IRQHandler                                  build/debug/startup_f446re.o
+UART5_IRQHandler                                  build/debug/startup_f446re.o
+UART_DeInit                                       build/debug/stm32f4xx_uart.o
+UART_Init                                         build/debug/stm32f4xx_uart.o
+                                                  build/debug/main.o
+UART_Receive                                      build/debug/stm32f4xx_uart.o
+UART_ReceiveByte                                  build/debug/stm32f4xx_uart.o
+UART_Transmit                                     build/debug/stm32f4xx_uart.o
+UART_TransmitByte                                 build/debug/stm32f4xx_uart.o
+UART_TransmitString                               build/debug/stm32f4xx_uart.o
+                                                  build/debug/main.o
+USART1_IRQHandler                                 build/debug/startup_f446re.o
+USART2_IRQHandler                                 build/debug/startup_f446re.o
+USART3_IRQHandler                                 build/debug/startup_f446re.o
+USART6_IRQHandler                                 build/debug/startup_f446re.o
+UsageFault_Handler                                build/debug/startup_f446re.o
+WWDG_IRQHandler                                   build/debug/startup_f446re.o
+_ebss                                             build/debug/startup_f446re.o
+_edata                                            build/debug/startup_f446re.o
+_estack                                           build/debug/startup_f446re.o
+_etext                                            build/debug/startup_f446re.o
+_sbss                                             build/debug/startup_f446re.o
+_sdata                                            build/debug/startup_f446re.o
+main                                              build/debug/main.o
+                                                  build/debug/startup_f446re.o
+vector_table                                      build/debug/startup_f446re.o
