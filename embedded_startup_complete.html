@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embedded Systems Startup — Complete Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   Theme: Deep space — near-black bg, electric teal primary,
+   amber secondary, clean editorial structure.
+   Font: Outfit (geometric sans) + Fira Code (mono)
+============================================================ */
+:root {
+  --bg:        #08090f;
+  --bg-2:      #0d0f1a;
+  --surface:   #111422;
+  --card:      #141828;
+  --card-2:    #181e30;
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.13);
+
+  --teal:   #00e5c3;
+  --teal-d: rgba(0,229,195,0.12);
+  --teal-b: rgba(0,229,195,0.3);
+  --amber:  #ffb830;
+  --amber-d:rgba(255,184,48,0.1);
+  --amber-b:rgba(255,184,48,0.35);
+  --red:    #ff4d6a;
+  --red-d:  rgba(255,77,106,0.1);
+  --red-b:  rgba(255,77,106,0.3);
+  --green:  #3ddc84;
+  --green-d:rgba(61,220,132,0.1);
+  --green-b:rgba(61,220,132,0.3);
+  --blue:   #5b9cf6;
+  --blue-d: rgba(91,156,246,0.1);
+  --blue-b: rgba(91,156,246,0.3);
+  --purple: #c084fc;
+  --purple-d:rgba(192,132,252,0.1);
+
+  --txt:     #dce4f0;
+  --txt-mid: #7a90b0;
+  --txt-dim: #3a4a60;
+  --txt-code:#a8c8e8;
+
+  --mono: 'Fira Code', monospace;
+  --sans: 'Outfit', sans-serif;
+
+  /* code token colors */
+  --ck: #c084fc;  /* keyword */
+  --ct: #67e8f9;  /* type */
+  --cf: #4ade80;  /* function */
+  --cs: #fbbf24;  /* string */
+  --cc: #334466;  /* comment */
+  --cn: #fb923c;  /* number/macro */
+  --cv: #e2e8f0;  /* variable */
+  --cp: #93c5fd;  /* preprocessor */
+  --cm: #22d3ee;  /* special / target */
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:var(--sans);
+  font-size:15.5px;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* ── BACKGROUND GRID ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,195,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,195,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+/* ── GLOW ORBS ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%,rgba(0,229,195,0.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 85%,rgba(255,184,48,0.04) 0%,transparent 55%);
+}
+
+.page{position:relative;z-index:1}
+
+/* ============================================================
+   SIDEBAR NAV
+============================================================ */
+.layout{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  min-height:100vh;
+}
+
+.sidebar{
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;overflow-x:hidden;
+  background:var(--bg-2);
+  border-right:1px solid var(--border);
+  padding:0 0 3rem;
+}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-hi)}
+
+.nav-top{
+  padding:2rem 1.5rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:0.5rem;
+}
+.nav-logo{
+  font-family:var(--mono);font-size:0.65rem;
+  letter-spacing:0.1em;color:var(--teal);margin-bottom:0.3rem;
+}
+.nav-title{
+  font-weight:800;font-size:1rem;color:var(--txt);line-height:1.2;
+}
+.nav-sub{
+  font-size:0.75rem;color:var(--txt-dim);margin-top:0.3rem;
+  font-family:var(--mono);
+}
+
+.nav-group{padding:0.5rem 1rem}
+.nav-group-label{
+  font-family:var(--mono);font-size:0.55rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--txt-dim);padding:0.8rem 0.5rem 0.35rem;
+}
+.nav-item{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.42rem 0.7rem;border-radius:6px;
+  text-decoration:none;
+  font-size:0.8rem;color:var(--txt-mid);
+  transition:all 0.15s;cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--txt)}
+.nav-item.active{background:var(--teal-d);color:var(--teal)}
+.nav-item .ni-num{
+  font-family:var(--mono);font-size:0.58rem;
+  color:var(--txt-dim);min-width:1.4rem;flex-shrink:0;
+}
+.nav-item.active .ni-num{color:var(--teal)}
+.nav-item .ni-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border-hi);flex-shrink:0;
+}
+.nav-item.active .ni-dot{background:var(--teal);box-shadow:0 0 6px var(--teal)}
+
+/* ============================================================
+   MAIN
+============================================================ */
+.main{min-width:0;background:var(--bg)}
+
+/* ── HERO ── */
+.hero{
+  padding:4.5rem 4rem 4rem;
+  background:linear-gradient(160deg,#0d1220 0%,#08090f 100%);
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.hero-bg-text{
+  position:absolute;right:-2rem;bottom:-2rem;
+  font-size:14rem;font-weight:900;line-height:1;
+  color:rgba(255,255,255,0.015);letter-spacing:-0.05em;
+  font-family:var(--sans);pointer-events:none;user-select:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-family:var(--mono);font-size:0.62rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--teal);border:1px solid var(--teal-b);
+  background:var(--teal-d);
+  padding:0.3rem 0.9rem;border-radius:100px;
+  margin-bottom:1.5rem;
+}
+.badge-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--teal);box-shadow:0 0 6px var(--teal);
+  animation:blink 1.8s ease infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.hero h1{
+  font-weight:900;
+  font-size:clamp(2.5rem,4vw,4rem);
+  line-height:1.05;letter-spacing:-0.03em;
+  color:#fff;margin-bottom:1.2rem;
+}
+.hero h1 .teal{color:var(--teal)}
+.hero h1 .amber{color:var(--amber)}
+.hero-desc{
+  font-size:1rem;color:var(--txt-mid);
+  max-width:580px;line-height:1.75;font-weight:300;
+}
+.hero-pills{
+  display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:2rem;
+}
+.hpill{
+  font-family:var(--mono);font-size:0.58rem;
+  letter-spacing:0.08em;text-transform:uppercase;
+  padding:0.28rem 0.7rem;border-radius:4px;
+  border:1px solid var(--border-hi);color:var(--txt-mid);
+  background:var(--surface);
+}
+.hpill.hi{
+  color:var(--teal);border-color:var(--teal-b);background:var(--teal-d);
+}
+
+/* ── CONTENT ── */
+.content{padding:0 4rem 8rem;max-width:860px}
+
+/* ── SECTION ── */
+.sec{
+  padding-top:4rem;
+  scroll-margin-top:1.5rem;
+}
+
+.sec-header{
+  display:flex;align-items:center;gap:1rem;
+  margin-bottom:2rem;padding-bottom:1.2rem;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.sec-header::after{
+  content:'';position:absolute;bottom:-1px;left:0;
+  height:2px;background:var(--teal);
+  transition:width 0.3s;
+}
+.sec-num{
+  font-family:var(--mono);font-size:0.62rem;font-weight:700;
+  letter-spacing:0.08em;
+  padding:0.25rem 0.65rem;border-radius:4px;
+  flex-shrink:0;
+}
+.num-0{background:var(--surface);color:var(--txt-dim);border:1px solid var(--border);}
+.num-1{background:var(--teal-d);color:var(--teal);border:1px solid var(--teal-b);}
+.num-2{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.num-3{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b);}
+.num-4{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.num-5{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.num-6{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b);}
+.num-7{background:var(--purple-d);color:var(--purple);border:1px solid rgba(192,132,252,0.3);}
+.num-8{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+.num-x{background:var(--surface);color:var(--txt-mid);border:1px solid var(--border);}
+
+.sec h2{
+  font-size:1.65rem;font-weight:800;
+  color:#fff;letter-spacing:-0.02em;line-height:1.1;
+}
+.sec h3{
+  font-size:0.95rem;font-weight:700;
+  color:#fff;margin:1.8rem 0 0.7rem;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.sec h3::before{
+  content:'';display:block;width:3px;height:14px;
+  background:var(--teal);border-radius:2px;flex-shrink:0;
+}
+
+/* ── PROSE ── */
+.prose{
+  font-size:0.92rem;color:var(--txt-mid);line-height:1.8;
+  margin-bottom:1.2rem;font-weight:400;
+}
+.prose strong{color:var(--txt);font-weight:600}
+.prose em{color:var(--teal);font-style:normal;
+  font-family:var(--mono);font-size:0.84em}
+
+/* ── CONCEPT BOX ── */
+.concept{
+  background:var(--card);border:1px solid var(--border);
+  border-left:3px solid var(--teal);
+  padding:1.3rem 1.5rem;border-radius:6px;
+  margin-bottom:1.3rem;
+}
+.concept p{font-size:0.9rem;color:var(--txt-mid);line-height:1.75}
+.concept p+p{margin-top:0.7rem}
+.concept strong{color:var(--txt);font-weight:600}
+
+/* ── CALLOUT BOXES ── */
+.callout{
+  border-radius:6px;padding:1rem 1.3rem;margin-bottom:1.3rem;font-size:0.87rem;
+}
+.callout-label{
+  font-family:var(--mono);font-size:0.58rem;
+  letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;
+}
+.callout.warn{background:var(--red-d);border:1px solid var(--red-b);border-left:3px solid var(--red);color:#c97080}
+.callout.warn .callout-label{color:var(--red)}
+.callout.tip{background:var(--teal-d);border:1px solid var(--teal-b);border-left:3px solid var(--teal);color:#50a898}
+.callout.tip .callout-label{color:var(--teal)}
+.callout.note{background:var(--amber-d);border:1px solid var(--amber-b);border-left:3px solid var(--amber);color:#a07830}
+.callout.note .callout-label{color:var(--amber)}
+.callout.info{background:var(--blue-d);border:1px solid var(--blue-b);border-left:3px solid var(--blue);color:#5080b0}
+.callout.info .callout-label{color:var(--blue)}
+.callout strong{color:#fff;font-weight:600}
+
+/* ── INLINE CODE ── */
+code{
+  font-family:var(--mono);font-size:0.8em;
+  color:var(--teal);background:var(--teal-d);
+  border:1px solid var(--teal-b);
+  padding:0.1em 0.35em;border-radius:3px;
+}
+
+/* ── CODE BLOCK ── */
+.cb{
+  background:#04060c;border:1px solid rgba(255,255,255,0.06);
+  border-radius:6px;overflow:hidden;margin-bottom:1.4rem;
+}
+.cb-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.55rem 1rem;background:#08090f;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.cb-dots{display:flex;gap:5px}
+.cbd{width:9px;height:9px;border-radius:50%}
+.cbd.r{background:#ff5f57}.cbd.y{background:#febc2e}.cbd.g{background:#28c840}
+.cb-name{font-family:var(--mono);font-size:0.6rem;color:var(--txt-dim)}
+pre{
+  padding:1.3rem 1.2rem;overflow-x:auto;
+  font-family:var(--mono);font-size:0.75rem;line-height:1.9;
+  color:#4a6080;
+}
+.ck{color:#c084fc}.ct{color:#67e8f9}.cf{color:#4ade80}
+.cs{color:#fbbf24}.cc{color:#1e3050;font-style:italic}
+.cn{color:#fb923c}.cv{color:#e2e8f0}.cp{color:#93c5fd}
+.cm{color:#22d3ee;font-weight:600}
+.hl{display:block;background:rgba(0,229,195,0.05);border-left:2px solid var(--teal);padding-left:0.5rem;margin-left:-0.5rem}
+.hl-a{display:block;background:rgba(255,184,48,0.05);border-left:2px solid var(--amber);padding-left:0.5rem;margin-left:-0.5rem}
+.hl-r{display:block;background:rgba(255,77,106,0.05);border-left:2px solid var(--red);padding-left:0.5rem;margin-left:-0.5rem}
+
+/* ── BIG FLOW DIAGRAM ── */
+.flow{position:relative;padding-left:2.5rem;margin-bottom:2rem}
+.flow::before{
+  content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,transparent,var(--teal-b) 5%,var(--teal-b) 95%,transparent);
+}
+.flow-node{position:relative;margin-bottom:0.5rem}
+.flow-dot{
+  position:absolute;left:-2.5rem;
+  width:24px;height:24px;border-radius:50%;
+  border:2px solid;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:0.58rem;font-weight:700;
+  top:1.05rem;z-index:1;
+}
+.flow-dot.d0{border-color:var(--txt-dim);color:var(--txt-dim)}
+.flow-dot.d1{border-color:var(--teal);color:var(--teal);box-shadow:0 0 12px rgba(0,229,195,0.3)}
+.flow-dot.d2{border-color:var(--red);color:var(--red);box-shadow:0 0 10px rgba(255,77,106,0.3)}
+.flow-dot.d3{border-color:var(--amber);color:var(--amber);box-shadow:0 0 10px rgba(255,184,48,0.25)}
+.flow-dot.d4{border-color:var(--blue);color:var(--blue);box-shadow:0 0 10px rgba(91,156,246,0.3)}
+.flow-dot.d5{border-color:var(--blue);color:var(--blue)}
+.flow-dot.d6{border-color:var(--amber);color:var(--amber)}
+.flow-dot.d7{border-color:var(--purple);color:var(--purple);box-shadow:0 0 10px rgba(192,132,252,0.3)}
+.flow-dot.d8{border-color:var(--green);color:var(--green);box-shadow:0 0 14px rgba(61,220,132,0.35)}
+.flow-dot.dR{border-color:var(--txt-dim);background:var(--txt-dim);color:var(--bg)}
+
+.flow-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;margin:0.4rem 0 0.6rem;
+  overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.flow-card:hover{border-color:var(--border-hi)}
+.flow-card.c1:hover{border-color:var(--teal-b);box-shadow:0 0 16px rgba(0,229,195,0.07)}
+.flow-card.c2:hover{border-color:var(--red-b);box-shadow:0 0 16px rgba(255,77,106,0.07)}
+.flow-card.c3:hover,.flow-card.c6:hover{border-color:var(--amber-b)}
+.flow-card.c4:hover,.flow-card.c5:hover{border-color:var(--blue-b)}
+.flow-card.c7:hover{border-color:rgba(192,132,252,0.3)}
+.flow-card.c8:hover{border-color:var(--green-b);box-shadow:0 0 16px rgba(61,220,132,0.08)}
+
+.fc-summary{
+  display:flex;align-items:center;gap:1rem;
+  padding:1rem 1.2rem;
+}
+.fc-tag{
+  font-family:var(--mono);font-size:0.6rem;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;
+  padding:0.2rem 0.55rem;border-radius:4px;flex-shrink:0;
+}
+.tag-0{background:var(--surface);color:var(--txt-dim);border:1px solid var(--border)}
+.tag-1{background:var(--teal-d);color:var(--teal);border:1px solid var(--teal-b)}
+.tag-2{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.tag-3{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b)}
+.tag-4,.tag-5{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+.tag-6{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b)}
+.tag-7{background:var(--purple-d);color:var(--purple);border:1px solid rgba(192,132,252,0.3)}
+.tag-8{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.tag-R{background:var(--surface);color:var(--txt-dim);border:1px solid var(--border)}
+
+.fc-title{font-weight:700;color:#fff;font-size:1rem;flex:1;line-height:1.2}
+.fc-arrow{font-size:0.7rem;color:var(--txt-dim);transition:transform 0.25s,color 0.15s;flex-shrink:0}
+.flow-card.open .fc-arrow{transform:rotate(90deg);color:var(--teal)}
+.fc-hint{
+  font-size:0.8rem;color:var(--txt-dim);
+  padding:0 1.2rem 0.85rem;line-height:1.5;
+}
+
+/* expanded body */
+.fc-body{display:none;border-top:1px solid var(--border);padding:1.4rem 1.3rem}
+.flow-card.open .fc-body{display:block}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin-bottom:1.4rem;border-radius:6px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.74rem}
+thead{background:var(--bg-2)}
+th{
+  padding:0.75rem 1rem;text-align:left;
+  font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--txt-dim);font-weight:500;border-bottom:1px solid var(--border);
+}
+td{padding:0.7rem 1rem;border-bottom:1px solid var(--border);color:var(--txt-mid);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.015)}
+td:first-child{color:var(--txt);font-weight:500}
+td.ok{color:var(--green)}.td-w{color:var(--red)}.td-a{color:var(--amber)}
+
+/* ── POINT LIST ── */
+.pts{list-style:none;display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.2rem}
+.pts li{
+  display:flex;gap:0.7rem;align-items:flex-start;
+  font-size:0.87rem;color:var(--txt-mid);line-height:1.6;
+}
+.mk{font-family:var(--mono);font-size:0.7rem;flex-shrink:0;margin-top:0.2rem}
+.mk.ok{color:var(--green)}.mk.no{color:var(--red)}.mk.nt{color:var(--amber)}.mk.info{color:var(--blue)}
+.pts li strong{color:var(--txt);font-weight:600}
+
+/* ── DEP ORDER ── */
+.dep-chain{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;
+  margin-bottom:1.2rem;
+  background:var(--card);border:1px solid var(--border);
+  padding:1rem 1.2rem;border-radius:6px;
+}
+.dep-item{
+  font-family:var(--mono);font-size:0.7rem;font-weight:500;
+  padding:0.3rem 0.65rem;border-radius:4px;
+  background:var(--surface);border:1px solid var(--border-hi);color:var(--txt-mid);
+}
+.dep-arrow{color:var(--txt-dim);font-size:0.9rem}
+
+/* ── LAYER MAP ── */
+.layer-map{
+  border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;
+}
+.lm-hdr{
+  background:var(--bg-2);padding:0.7rem 1.2rem;
+  border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:0.58rem;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--txt-dim);
+  display:grid;grid-template-columns:120px 1fr 90px;
+}
+.lm-row{
+  display:grid;grid-template-columns:120px 1fr 90px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:0.74rem;
+}
+.lm-row:last-child{border-bottom:none}
+.lm-row:hover{background:rgba(255,255,255,0.01)}
+.lm-file{
+  padding:0.85rem 1.1rem;font-weight:700;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;
+  background:rgba(255,255,255,0.01);
+}
+.lm-content{
+  padding:0.85rem 1.1rem;color:var(--txt-mid);line-height:1.55;
+  border-right:1px solid var(--border);
+}
+.lm-content code{font-size:0.72em}
+.lm-scope{
+  padding:0.85rem 0.8rem;display:flex;
+  align-items:center;justify-content:center;
+  font-size:0.58rem;letter-spacing:0.1em;text-align:center;
+}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem}
+@media(max-width:540px){.two-col{grid-template-columns:1fr}}
+.mini{
+  background:var(--card);border:1px solid var(--border);
+  padding:1rem 1.1rem;border-radius:6px;
+}
+.mini-title{
+  font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:0.4rem;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.mini-body{font-size:0.81rem;color:var(--txt-mid);line-height:1.6}
+
+/* ── CHECKLIST ── */
+.checklist{list-style:none;display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.5rem}
+.checklist li{
+  display:flex;align-items:flex-start;gap:0.75rem;
+  font-size:0.87rem;color:var(--txt-mid);
+  background:var(--card);border:1px solid var(--border);
+  padding:0.75rem 1.1rem;border-radius:6px;line-height:1.55;
+  transition:border-color 0.15s;
+}
+.checklist li:hover{border-color:var(--border-hi)}
+.ch-n{font-family:var(--mono);font-size:0.62rem;color:var(--teal);flex-shrink:0;min-width:1.5rem}
+
+/* ── SECTION DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+
+/* ── FOOTER ── */
+.footer{
+  background:var(--bg-2);border-top:1px solid var(--border);
+  padding:2rem 4rem;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+}
+.footer p{font-family:var(--mono);font-size:0.62rem;color:var(--txt-dim)}
+.footer-tag{
+  font-family:var(--mono);font-size:0.62rem;
+  color:var(--teal);border:1px solid var(--teal-b);
+  padding:0.2rem 0.6rem;border-radius:4px;
+}
+
+/* ── SCROLL REVEAL ── */
+.sr{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease}
+.sr.vis{opacity:1;transform:none}
+
+/* ── ANIM ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.a1{animation:fadeUp 0.5s 0.05s ease both}
+.a2{animation:fadeUp 0.5s 0.15s ease both}
+.a3{animation:fadeUp 0.5s 0.25s ease both}
+.a4{animation:fadeUp 0.5s 0.35s ease both}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+
+/* RESPONSIVE */
+@media(max-width:840px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .hero,.content{padding-left:1.5rem;padding-right:1.5rem}
+  .footer{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="layout">
+
+<!-- ══════════════════════════════════
+  SIDEBAR
+══════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="nav-top">
+    <div class="nav-logo">// embedded.dev/startup</div>
+    <div class="nav-title">Embedded Startup<br>Complete Guide</div>
+    <div class="nav-sub">v2.0 · C · Cortex-M</div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">The Big Picture</div>
+    <a href="#understand" class="nav-item"><span class="ni-num">00</span><span class="ni-dot"></span>Understand First</a>
+    <a href="#flow" class="nav-item"><span class="ni-num">01</span><span class="ni-dot"></span>Full Startup Flow</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Layer by Layer</div>
+    <a href="#reset" class="nav-item"><span class="ni-num">02</span><span class="ni-dot"></span>Reset Handler</a>
+    <a href="#clock" class="nav-item"><span class="ni-num">03</span><span class="ni-dot"></span>Clock Init</a>
+    <a href="#watchdog" class="nav-item"><span class="ni-num">04</span><span class="ni-dot"></span>Watchdog</a>
+    <a href="#power" class="nav-item"><span class="ni-num">05</span><span class="ni-dot"></span>Power Init</a>
+    <a href="#gpio" class="nav-item"><span class="ni-num">06</span><span class="ni-dot"></span>GPIO Init</a>
+    <a href="#peripherals" class="nav-item"><span class="ni-num">07</span><span class="ni-dot"></span>Peripherals</a>
+    <a href="#post" class="nav-item"><span class="ni-num">08</span><span class="ni-dot"></span>Self-Test (POST)</a>
+    <a href="#appinit" class="nav-item"><span class="ni-num">09</span><span class="ni-dot"></span>App Init</a>
+    <a href="#loop" class="nav-item"><span class="ni-num">10</span><span class="ni-dot"></span>Main Loop</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Production</div>
+    <a href="#main" class="nav-item"><span class="ni-num">11</span><span class="ni-dot"></span>Complete main()</a>
+    <a href="#patterns" class="nav-item"><span class="ni-num">12</span><span class="ni-dot"></span>Design Patterns</a>
+    <a href="#checklist" class="nav-item"><span class="ni-num">13</span><span class="ni-dot"></span>Final Checklist</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════
+  MAIN
+══════════════════════════════════ -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">START</div>
+  <div class="hero-badge a1"><div class="badge-dot"></div>Embedded Systems · Production C</div>
+  <h1 class="a2">Embedded <span class="teal">Startup</span><br><span class="amber">Complete</span> Guide</h1>
+  <p class="hero-desc a3">
+    Everything from Reset_Handler to Main Loop — the right concepts, the right order, the right code. Beginner-readable, production-grade. No fluff.
+  </p>
+  <div class="hero-pills a4">
+    <span class="hpill hi">GNU C11</span>
+    <span class="hpill">ARM Cortex-M</span>
+    <span class="hpill">STM32 / NXP / TI</span>
+    <span class="hpill">IEC 61508 Aware</span>
+    <span class="hpill">RTOS Ready</span>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════
+  §00 — UNDERSTAND FIRST
+══════════════════════════════════ -->
+<section class="sec" id="understand">
+  <div class="sec-header"><span class="sec-num num-x">00</span><h2>Understand the Two Concepts</h2></div>
+
+  <p class="prose sr">Before writing a single line, you need to understand a distinction that confuses beginners and experts alike — and causes more bad firmware than any other single misunderstanding.</p>
+
+  <div class="two-col sr">
+    <div class="mini" style="border-color:rgba(0,229,195,0.25)">
+      <div class="mini-title" style="color:var(--teal)">📄 Startup Code (narrow)</div>
+      <div class="mini-body">The <code>Reset_Handler</code> in <code>startup.s</code> or <code>startup.c</code>. Runs before <code>main()</code>. Sets up the C runtime — nothing else. <strong>Minimal. Automatic. Usually vendor-provided.</strong></div>
+    </div>
+    <div class="mini" style="border-color:rgba(255,184,48,0.3)">
+      <div class="mini-title" style="color:var(--amber)">🏗 Startup Sequence (full)</div>
+      <div class="mini-body">Everything from Reset to steady-state operation: clock, watchdog, power, GPIO, peripherals, self-test, app init. Lives in <code>main()</code> and driver files. <strong>This is what you architect.</strong></div>
+    </div>
+  </div>
+
+  <div class="callout tip sr">
+    <div class="callout-label">// The rule</div>
+    <strong>Reset_Handler = minimal, vendor-provided, rarely touched.</strong> The startup <em>sequence</em> inside <code>main()</code> = your full responsibility, fully architected, the most consequential code you'll ever write. Both are "startup" — this guide covers both.
+  </div>
+
+  <div class="callout warn sr">
+    <div class="callout-label">⚠ Common mistake</div>
+    Thinking that because GPIO init "goes in main()" it's not part of startup. It IS. The startup sequence is everything that runs in <code>main()</code> before your application loop. Clock → watchdog → power → GPIO → peripherals → POST → app init. <strong>All of it is startup. All of it must be in the right order.</strong>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+  §01 — FULL STARTUP FLOW (overview)
+══════════════════════════════════ -->
+<section class="sec" id="flow">
+  <div class="sec-header"><span class="sec-num num-1">01</span><h2>The Full Startup Flow</h2></div>
+  <p class="prose sr">Click any step to expand the full concept, rules, and code for that layer.</p>
+
+  <div class="flow sr">
+
+    <!-- RESET / POWER-ON (no expand) -->
+    <div class="flow-node">
+      <div class="flow-dot dR">⚡</div>
+      <div class="flow-card" style="cursor:default;border-color:rgba(255,255,255,0.05)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-R">Hardware</span>
+          <span class="fc-title">Power-On / Reset — Automatic</span>
+        </div>
+        <div class="fc-hint">PC jumps to Reset_Handler address in the vector table. Stack pointer loaded from first word of Flash. No code runs before this.</div>
+      </div>
+    </div>
+
+    <!-- 0: Reset Handler -->
+    <div class="flow-node">
+      <div class="flow-dot d0">00</div>
+      <div class="flow-card c0" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-0">startup.s</span>
+          <span class="fc-title">Reset_Handler — C Runtime Setup</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">Copy .data Flash→RAM · Zero .bss · Call SystemInit() · Jump to main()</div>
+        <div class="fc-body">
+          <p class="prose">The Reset_Handler is the <strong>true firmware entry point</strong> — not <code>main()</code>. It runs before the C runtime exists. No global variables. No initialized data. No heap. Its only job: create conditions for C to run correctly.</p>
+          <div class="callout warn">
+            <div class="callout-label">⚠ Critical</div>
+            <strong>Never call <code>memset()</code> or <code>memcpy()</code> here.</strong> The C library depends on <code>.bss</code> being zeroed before those functions work. Use raw pointer loops only.
+          </div>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><strong>Copy .data</strong> — initialized globals live in Flash (LMA), but C expects them in RAM (VMA). Copy word-by-word.</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Zero .bss</strong> — uninitialized globals must be zero per the C standard. ROM contains garbage here.</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Call SystemInit()</strong> — vendor CMSIS: configures FPU, sets basic clock. Keep minimal.</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Jump to main()</strong> — never returns. Add <code>while(1){}</code> as a safety net.</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">startup.c — Reset_Handler</span></div>
+<pre><span class="ck">extern</span> <span class="ct">uint32_t</span> _sidata, _sdata, _edata, _sbss, _ebss;
+
+<span class="ct">void</span> <span class="cf">Reset_Handler</span>(<span class="ct">void</span>) {
+    <span class="ct">uint32_t</span> *src = &_sidata, *dst = &_sdata;
+
+    <span class="cc">/* 1. Copy .data: Flash → RAM (NO memcpy!) */</span>
+<span class="hl">    <span class="ck">while</span> (dst &lt; &_edata) *dst++ = *src++;
+</span>
+    <span class="cc">/* 2. Zero .bss (NO memset!) */</span>
+<span class="hl">    <span class="ck">for</span> (dst = &_sbss; dst &lt; &_ebss; ) *dst++ = <span class="cn">0U</span>;
+</span>
+    <span class="cc">/* 3. Vendor init — FPU, basic clock */</span>
+    <span class="cf">SystemInit</span>();
+
+    <span class="cc">/* 4. Jump to main — never returns */</span>
+    <span class="cf">main</span>();
+    <span class="ck">while</span>(<span class="cn">1</span>) {}   <span class="cc">/* safety net */</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1: Clock Init -->
+    <div class="flow-node">
+      <div class="flow-dot d1">01</div>
+      <div class="flow-card c1" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-1">Layer 1 — Clock</span>
+          <span class="fc-title">Clock Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">HSI boot → HSE enable → PLL configure → switch SYSCLK → set bus dividers</div>
+        <div class="fc-body">
+          <p class="prose"><strong>Everything in your firmware runs at a frequency determined here.</strong> UART baud rates, ADC sample rates, PWM periods, RTOS tick — all derived from SYSCLK. Wrong clocks = subtle, non-reproducible bugs.</p>
+          <div class="callout warn">
+            <div class="callout-label">⚠ Most Missed Rule</div>
+            <strong>Set Flash wait states BEFORE increasing clock frequency.</strong> Running at 72 MHz with 0 wait states causes random instruction fetch failures — one of the hardest bugs to diagnose.
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>Source</th><th>Accuracy</th><th>Startup</th><th>Best For</th></tr></thead>
+            <tbody>
+              <tr><td>HSI / IRC</td><td class="td-a">~1–2%</td><td>Instant</td><td>Boot default, failsafe fallback</td></tr>
+              <tr><td>HSE / Crystal</td><td class="ok">PPM level</td><td>~ms</td><td>UART, USB, audio, precision</td></tr>
+              <tr><td>PLL (from HSE)</td><td class="ok">PPM level</td><td>Slowest</td><td><strong>Production — prefer this</strong></td></tr>
+              <tr><td>LSI</td><td class="td-a">~5–10%</td><td>Fast</td><td>IWDG watchdog</td></tr>
+              <tr><td>LSE / 32kHz</td><td class="ok">PPM level</td><td>Slow</td><td>RTC accurate timekeeping</td></tr>
+            </tbody></table>
+          </div>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><strong>Flash wait states first</strong> (e.g. 2WS for 72 MHz on STM32F1) — BEFORE raising clock</span></li>
+            <li><span class="mk ok">▸</span><span>Enable HSE, wait ready — <strong>with timeout</strong></span></li>
+            <li><span class="mk ok">▸</span><span>Configure PLL multiplier/prediv, enable, wait lock — <strong>with timeout</strong></span></li>
+            <li><span class="mk ok">▸</span><span>Set AHB/APB1/APB2 bus dividers within rated limits</span></li>
+            <li><span class="mk ok">▸</span><span>Switch SYSCLK to PLL, confirm switch — <strong>with timeout</strong></span></li>
+            <li><span class="mk ok">▸</span><span>Call <code>SystemCoreClock_Update()</code> — keeps HAL/CMSIS in sync</span></li>
+            <li><span class="mk no">▸</span><span>If HSE fails → fall back to HSI, log error, return error status — <strong>never hang</strong></span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">clock.c — generalized pattern</span></div>
+<pre><span class="ct">Clock_Status_t</span> <span class="cf">Clock_Init</span>(<span class="ct">void</span>) {
+    <span class="ct">uint32_t</span> t;
+<span class="hl">    <span class="cf">FLASH_SetWaitStates</span>(<span class="cn">2</span>);              <span class="cc">/* FIRST — before raising freq */</span>
+</span>
+    <span class="cf">HSE_Enable</span>();
+    t = <span class="cf">Tick_ms</span>();
+    <span class="ck">while</span> (!<span class="cf">HSE_Ready</span>()) {
+        <span class="ck">if</span> (<span class="cf">Tick_ms</span>() - t &gt; <span class="cn">100</span>) {
+            <span class="cf">Error_Log</span>(ERR_HSE_TIMEOUT);
+            <span class="ck">return</span> CLOCK_HSE_TIMEOUT;      <span class="cc">/* never hang */</span>
+        }
+    }
+    <span class="cf">PLL_Configure</span>(PLL_SRC_HSE, <span class="cn">9</span>, <span class="cn">1</span>);    <span class="cc">/* 8MHz × 9 = 72MHz */</span>
+    <span class="cf">PLL_Enable</span>();
+    t = <span class="cf">Tick_ms</span>();
+    <span class="ck">while</span> (!<span class="cf">PLL_Locked</span>()) {
+        <span class="ck">if</span> (<span class="cf">Tick_ms</span>() - t &gt; <span class="cn">100</span>)
+            <span class="ck">return</span> CLOCK_PLL_TIMEOUT;
+    }
+    <span class="cf">BusDividers_Set</span>(AHB_DIV1, APB1_DIV2, APB2_DIV1);
+    <span class="cf">SYSCLK_SetSource</span>(PLL);
+    <span class="cf">SystemCoreClock_Update</span>();
+    <span class="ck">return</span> CLOCK_OK;
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2: Watchdog -->
+    <div class="flow-node">
+      <div class="flow-dot d2">02</div>
+      <div class="flow-card c2" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-2">Layer 2 — Safety</span>
+          <span class="fc-title">Watchdog Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">Start IWDG right after clock is stable — before any peripheral init — non-negotiable</div>
+        <div class="fc-body">
+          <p class="prose">The watchdog resets the MCU if software stops refreshing it within the timeout. <strong>Start it early — right after clocks — so any subsequent init hang is automatically recovered.</strong> Log watchdog resets to NVM on every boot so field failures are diagnosable.</p>
+          <div class="two-col">
+            <div class="mini"><div class="mini-title" style="color:var(--red)">IWDG — Independent</div><div class="mini-body">Clocked from LSI (~40 kHz). Runs even if main clock fails. Cannot be stopped once started. Use for system-level protection.</div></div>
+            <div class="mini"><div class="mini-title" style="color:var(--amber)">WWDG — Window</div><div class="mini-body">Clocked from PCLK. Refresh too early OR too late triggers reset. Use to validate that your loop timing is correct.</div></div>
+          </div>
+          <ul class="pts">
+            <li><span class="mk nt">▸</span><span><strong>Check WDG reset flag first</strong> — log to NVM before anything else overwrites it</span></li>
+            <li><span class="mk ok">▸</span><span>Configure prescaler + reload for desired timeout (e.g., 1 second)</span></li>
+            <li><span class="mk ok">▸</span><span>Start IWDG — <strong>cannot be stopped after this point</strong></span></li>
+            <li><span class="mk ok">▸</span><span>Call <code>Watchdog_Refresh()</code> first thing in every main loop iteration</span></li>
+            <li><span class="mk no">▸</span><span>In safe mode — do <strong>NOT</strong> refresh. Let WDG reset the system automatically.</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">watchdog.c</span></div>
+<pre><span class="cc">/* LSI=40kHz, Prescaler=64 → 625 Hz tick → Reload=625 → 1s timeout */</span>
+<span class="ct">void</span> <span class="cf">Watchdog_Init</span>(<span class="ct">void</span>) {
+    <span class="cf">IWDG_Unlock</span>();                     <span class="cc">/* Write 0x5555 */</span>
+    <span class="cf">IWDG_SetPrescaler</span>(IWDG_PR_64);
+    <span class="cf">IWDG_SetReload</span>(<span class="cn">625</span>);
+    <span class="cf">IWDG_Refresh</span>();                    <span class="cc">/* Write 0xAAAA */</span>
+<span class="hl">    <span class="cf">IWDG_Start</span>();                      <span class="cc">/* Write 0xCCCC — CANNOT STOP */</span>
+</span>}
+<span class="ck">inline</span> <span class="ct">void</span> <span class="cf">Watchdog_Refresh</span>(<span class="ct">void</span>) { <span class="cf">IWDG_KR</span> = <span class="cn">0xAAAA</span>; }
+<span class="ct">bool</span>        <span class="cf">Watchdog_WasReset</span>(<span class="ct">void</span>) { <span class="ck">return</span> RCC->CSR & RCC_CSR_IWDGRSTF; }</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: Power Init -->
+    <div class="flow-node">
+      <div class="flow-dot d3">03</div>
+      <div class="flow-card c3" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-3">Layer 3 — Power</span>
+          <span class="fc-title">Power & Voltage Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">Voltage scale · Brown-Out Reset · Vref enable · Supply rail validation</div>
+        <div class="fc-body">
+          <p class="prose">An MCU operating below its rated supply voltage causes <strong>Flash write corruption, wrong ADC readings, and random resets</strong>. Configure BOR to auto-reset the MCU if VDD drops below safe threshold, and measure VDD to confirm the supply is healthy before continuing.</p>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span>Enable PWR peripheral clock</span></li>
+            <li><span class="mk ok">▸</span><span>Set voltage scale matching target SYSCLK (higher freq = higher scale)</span></li>
+            <li><span class="mk ok">▸</span><span>Configure BOR level — e.g. BOR Level 3 → reset below ~2.7 V</span></li>
+            <li><span class="mk ok">▸</span><span>Enable internal Vref — required for accurate ADC readings</span></li>
+            <li><span class="mk ok">▸</span><span>Measure VDD via ADC and validate min/max limits</span></li>
+            <li><span class="mk no">▸</span><span>If undervolt detected → safe mode. Never operate with a starved supply.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4: GPIO Init -->
+    <div class="flow-node">
+      <div class="flow-dot d4">04</div>
+      <div class="flow-card c4" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-4">Layer 4 — GPIO</span>
+          <span class="fc-title">GPIO Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">All pins → Analog first (safe default) · Then configure only used pins · All assignments in board_config.h</div>
+        <div class="fc-body">
+          <p class="prose">GPIO init has two jobs: <strong>(1)</strong> put ALL unused pins in a safe, low-power state — Analog Input — to prevent floating inputs and minimize EMI. <strong>(2)</strong> configure functional pins. Define every pin assignment in one place: <code>board_config.h</code>.</p>
+          <div class="callout tip">
+            <div class="callout-label">// Industry Rule</div>
+            Set ALL GPIO pins to <strong>Analog Input mode first</strong> — lowest leakage, lowest EMI, no spurious interrupts. Then configure only the pins your design uses. Unconfigured floating pins are a common EMI compliance failure.
+          </div>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span>Enable all GPIO port clocks in one shot</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Set ALL pins to Analog Input first</strong> — safe default</span></li>
+            <li><span class="mk ok">▸</span><span>Configure output pins (LEDs): Push-Pull, Low speed, drive to known OFF state</span></li>
+            <li><span class="mk ok">▸</span><span>Configure input pins (buttons): Input, Pull-Up or Pull-Down</span></li>
+            <li><span class="mk ok">▸</span><span>Configure peripheral alternate function pins: AF mode, correct speed</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">gpio.c — correct pattern</span></div>
+<pre><span class="ct">void</span> <span class="cf">GPIO_Init_All</span>(<span class="ct">void</span>) {
+    <span class="cf">RCC_GPIO_ClockEnable</span>(GPIO_CLK_ALL);
+<span class="hl">    <span class="cf">GPIO_SetAllAnalog</span>();           <span class="cc">/* safe default — ALL pins */</span>
+</span>
+    <span class="cc">/* LEDs: output, push-pull, low speed, initially OFF */</span>
+    GPIO_InitTypeDef g = {GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_LOW};
+    g.Pin = LED_STATUS_PIN | LED_ERROR_PIN;
+    <span class="cf">GPIO_Init</span>(GPIOA, &g);
+    <span class="cf">GPIO_Write</span>(LED_STATUS_PORT, LED_STATUS_PIN, <span class="cn">0</span>);
+
+    <span class="cc">/* UART1: alternate function, high speed */</span>
+    g.Mode = GPIO_MODE_AF_PP; g.Speed = GPIO_SPEED_HIGH;
+    g.Alternate = GPIO_AF7_USART1;
+    g.Pin = UART1_TX_PIN | UART1_RX_PIN;
+    <span class="cf">GPIO_Init</span>(UART1_PORT, &g);
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5: Peripherals -->
+    <div class="flow-node">
+      <div class="flow-dot d5">05</div>
+      <div class="flow-card c5" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-5">Layer 5 — Drivers</span>
+          <span class="fc-title">Peripheral Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">Dependency order · Every init returns status · NVIC priorities set here</div>
+        <div class="fc-body">
+          <p class="prose">Peripherals must be initialized in <strong>dependency order</strong> — a peripheral that depends on another must come after it. Every init function must return a status code. Handle every failure.</p>
+          <div class="dep-chain">
+            <span class="dep-item">SysTick</span><span class="dep-arrow">→</span>
+            <span class="dep-item">DMA</span><span class="dep-arrow">→</span>
+            <span class="dep-item">Debug UART</span><span class="dep-arrow">→</span>
+            <span class="dep-item">SPI / I2C</span><span class="dep-arrow">→</span>
+            <span class="dep-item">ADC + Cal</span><span class="dep-arrow">→</span>
+            <span class="dep-item">Timers / PWM</span>
+          </div>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><strong>SysTick first</strong> — all delay/timeout functions depend on it</span></li>
+            <li><span class="mk ok">▸</span><span><strong>DMA before peripherals</strong> — SPI, UART Rx, ADC may all use DMA</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Debug UART early</strong> — so all subsequent failures can be logged to serial</span></li>
+            <li><span class="mk ok">▸</span><span><strong>ADC self-calibration</strong> — must run right after ADC init, before any reading</span></li>
+            <li><span class="mk ok">▸</span><span><strong>NVIC priorities</strong> — configure all interrupt priorities before enabling any IRQ</span></li>
+            <li><span class="mk nt">▸</span><span>Non-critical failure (debug UART) → log warning, continue</span></li>
+            <li><span class="mk no">▸</span><span>Critical failure (SysTick, DMA) → safe mode immediately</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">peripherals.c — orchestrator</span></div>
+<pre><span class="ct">Init_Status_t</span> <span class="cf">Peripherals_Init</span>(<span class="ct">void</span>) {
+    <span class="cc">/* SysTick — critical; abort if fails */</span>
+    <span class="ck">if</span> (<span class="cf">SysTick_Init</span>(<span class="cn">1000</span>) != INIT_OK) <span class="ck">return</span> INIT_FAIL;
+    <span class="cf">DMA_Init</span>();
+    <span class="cc">/* UART — non-critical (warn only) */</span>
+    <span class="ck">if</span> (<span class="cf">UART_Init</span>(DEBUG_UART, <span class="cn">115200</span>) != INIT_OK)
+        <span class="cf">Error_Log</span>(ERR_UART_WARN);
+    <span class="cf">SPI_Init</span>(SPI1, MODE_MASTER, <span class="cn">1000000</span>);
+    <span class="cf">I2C_Init</span>(I2C1, <span class="cn">400000</span>);
+    <span class="cf">ADC_Init</span>();
+<span class="hl">    <span class="cf">ADC_SelfCalibrate</span>();       <span class="cc">/* MANDATORY after ADC init */</span>
+</span><span class="hl">    <span class="cf">NVIC_SetPriority</span>(DMA_IRQn,   <span class="cn">0</span>);   <span class="cc">/* highest */</span>
+    <span class="cf">NVIC_SetPriority</span>(UART_IRQn,  <span class="cn">1</span>);
+    <span class="cf">NVIC_SetPriority</span>(SysTick_IRQn, <span class="cn">15</span>); <span class="cc">/* lowest */</span>
+</span>    <span class="ck">return</span> INIT_OK;
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6: POST -->
+    <div class="flow-node">
+      <div class="flow-dot d6">06</div>
+      <div class="flow-card c6" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-6">Layer 6 — Self-Test</span>
+          <span class="fc-title">Power-On Self-Test (POST)</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">RAM test · Flash CRC · Sensor range · Voltage rails · Fail fast, fail visibly</div>
+        <div class="fc-body">
+          <p class="prose">POST validates hardware integrity before entering normal operation. A system that silently operates with corrupted RAM is <strong>worse than one that fails visibly at boot</strong>. Required by IEC 61508 (industrial) and ISO 26262 (automotive).</p>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><strong>RAM March-C test</strong> — write 0xAA/0x55/0xFF/0x00 to each location, read back. Detects stuck bits.</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Flash CRC32</strong> — compute CRC over firmware image, compare against reference stored at build time</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Sensor plausibility</strong> — read each sensor, verify physically possible range (e.g. temp −40°C to +125°C)</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Voltage rail check</strong> — measure all rails via ADC, verify within ±5% of nominal</span></li>
+            <li><span class="mk nt">▸</span><span>Refresh watchdog between each test — POST can be slow</span></li>
+            <li><span class="mk no">▸</span><span>Any failure → log bitmask to NVM + safe mode. Never silently ignore POST failure.</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">self_test.c</span></div>
+<pre><span class="cp">#define POST_FAIL_RAM    0x01u
+#define POST_FAIL_FLASH  0x02u
+#define POST_FAIL_SENSOR 0x04u
+#define POST_FAIL_VOLT   0x08u</span>
+
+<span class="ct">uint32_t</span> <span class="cf">POST_RunAll</span>(<span class="ct">void</span>) {
+    <span class="ct">uint32_t</span> result = <span class="cn">0</span>;
+    <span class="cf">Watchdog_Refresh</span>();
+    <span class="ck">if</span> (!<span class="cf">RAM_MarchC_Test</span>(&_heap_start, &_heap_end)) result |= POST_FAIL_RAM;
+    <span class="cf">Watchdog_Refresh</span>();
+    <span class="ck">if</span> (<span class="cf">CRC32_Calc</span>(FLASH_BASE, FLASH_SIZE) != STORED_CRC) result |= POST_FAIL_FLASH;
+    <span class="ct">float</span> t = <span class="cf">Sensor_ReadTemp</span>();
+    <span class="ck">if</span> (t &lt; <span class="cn">-40.0f</span> || t &gt; <span class="cn">125.0f</span>)  result |= POST_FAIL_SENSOR;
+<span class="hl">    <span class="ck">if</span> (result) <span class="cf">System_EnterSafeMode</span>(result);  <span class="cc">/* log + WDG reset */</span>
+</span>    <span class="ck">return</span> result;
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7: App Init -->
+    <div class="flow-node">
+      <div class="flow-dot d7">07</div>
+      <div class="flow-card c7" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-7">Layer 7 — Application</span>
+          <span class="fc-title">Application Initialization</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">NVM config load · Calibrate sensors · Init state machines · Create RTOS tasks</div>
+        <div class="fc-body">
+          <p class="prose">Hardware is verified and running. Application init is <strong>completely free of direct register access</strong> — all hardware interaction goes through driver APIs. Load config, validate it, apply calibration, init state machines, create RTOS objects.</p>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><strong>Read config from NVM/EEPROM</strong> — if CRC invalid, load defaults and write them back</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Validate every config field</strong> — bounds-check before applying. Corrupted config is common in field.</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Apply calibration</strong> — load sensor gain/offset from NVM, pass to driver APIs</span></li>
+            <li><span class="mk ok">▸</span><span><strong>Init state machines</strong> — set initial state, clear history</span></li>
+            <li><span class="mk ok">▸</span><span><strong>RTOS tasks, queues, semaphores</strong> — create ALL before calling <code>vTaskStartScheduler()</code></span></li>
+            <li><span class="mk ok">▸</span><span>Signal successful startup — 3× LED blink, print debug banner with FW version</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8: Main Loop -->
+    <div class="flow-node">
+      <div class="flow-dot d8">08</div>
+      <div class="flow-card c8" onclick="toggle(this)">
+        <div class="fc-summary">
+          <span class="fc-tag tag-8">Running State</span>
+          <span class="fc-title">Main Loop / RTOS Scheduler</span>
+          <span class="fc-arrow">▶</span>
+        </div>
+        <div class="fc-hint">System fully initialized · WDG refresh every iteration · Never returns from main()</div>
+        <div class="fc-body">
+          <p class="prose">The system is fully initialized and verified. Enter the superloop or start the RTOS scheduler. <strong>Watchdog must be refreshed every iteration.</strong> <code>main()</code> must never return.</p>
+          <ul class="pts">
+            <li><span class="mk ok">▸</span><span><code>Watchdog_Refresh()</code> is the <strong>first call</strong> in every loop iteration</span></li>
+            <li><span class="mk ok">▸</span><span>Use WFI (<code>Power_EnterSleep()</code>) at the bottom — wake on interrupt for power efficiency</span></li>
+            <li><span class="mk ok">▸</span><span>For RTOS: <code>vTaskStartScheduler()</code> — never returns, replaces while(1)</span></li>
+            <li><span class="mk no">▸</span><span>If somehow exiting main() — hit <code>while(1){}</code> safety net. Never fall off end of main.</span></li>
+          </ul>
+          <div class="cb">
+            <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">main.c — loop options</span></div>
+<pre><span class="cc">/* Option A: Bare-metal superloop */</span>
+<span class="ck">while</span> (<span class="cn">1</span>) {
+<span class="hl">    <span class="cf">Watchdog_Refresh</span>();        <span class="cc">/* FIRST — every iteration */</span>
+</span>    <span class="cf">App_RunCycle</span>();             <span class="cc">/* state machine tick */</span>
+    <span class="cf">Power_EnterSleep</span>();         <span class="cc">/* WFI — wake on interrupt */</span>
+}
+
+<span class="cc">/* Option B: FreeRTOS */</span>
+<span class="cf">vTaskStartScheduler</span>();          <span class="cc">/* never returns */</span>
+
+<span class="cc">/* Safety net — should NEVER execute */</span>
+<span class="ck">while</span> (<span class="cn">1</span>) {}                    <span class="cc">/* WDG resets if reached */</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+</section>
+
+<!-- ══════════════════════════════════
+  §11 — COMPLETE main()
+══════════════════════════════════ -->
+<section class="sec" id="main">
+  <div class="sec-header"><span class="sec-num num-x">11</span><h2>The Complete main() — Copy-Paste Ready</h2></div>
+  <p class="prose sr"><code>main()</code> is a sequencer — not a place for register writes or magic numbers. One function call per layer, return value checked on every call.</p>
+
+  <div class="cb sr">
+    <div class="cb-top"><div class="cb-dots"><span class="cbd r"></span><span class="cbd y"></span><span class="cbd g"></span></div><span class="cb-name">main.c — Production Embedded Template</span></div>
+<pre><span class="cp">#include "clock.h"
+#include "watchdog.h"
+#include "power.h"
+#include "gpio.h"
+#include "peripherals.h"
+#include "self_test.h"
+#include "app.h"</span>
+
+<span class="cp">#define FW_MAJOR  1U
+#define FW_MINOR  0U
+#define FW_PATCH  0U</span>
+
+<span class="ct">int</span> <span class="cf">main</span>(<span class="ct">void</span>)
+{
+    <span class="cc">/* ── Interrupt priority grouping — must be first ─────────────── */</span>
+<span class="hl">    <span class="cf">NVIC_SetPriorityGrouping</span>(NVIC_PRIORITYGROUP_4);
+</span>
+    <span class="cc">/* ── Layer 1: Clock — everything depends on this ─────────────── */</span>
+<span class="hl">    <span class="ck">if</span> (<span class="cf">Clock_Init</span>() != CLOCK_OK)
+        <span class="cf">Error_BlinkForever</span>(ERR_CLOCK);       <span class="cc">/* can't log yet */</span>
+</span>
+    <span class="cc">/* ── Layer 2: Watchdog — start BEFORE any peripheral init ─────── */</span>
+<span class="hl">    <span class="ck">if</span> (<span class="cf">Watchdog_WasReset</span>()) <span class="cf">NVM_Log</span>(LOG_WDG_RESET);
+    <span class="cf">Watchdog_Init</span>();                         <span class="cc">/* starts — cannot stop */</span>
+</span>
+    <span class="cc">/* ── Layer 3: Power — voltage validation ─────────────────────── */</span>
+<span class="hl">    <span class="ck">if</span> (<span class="cf">Power_Init</span>() != PWR_OK)
+        <span class="cf">System_EnterSafeMode</span>(ERR_UNDERVOLT);
+</span>
+    <span class="cc">/* ── Layer 4: GPIO — safe state all pins first ───────────────── */</span>
+<span class="hl">    <span class="cf">GPIO_Init_All</span>();
+</span>
+    <span class="cc">/* ── Layer 5: Peripherals — in dependency order ──────────────── */</span>
+<span class="hl">    <span class="ck">if</span> (<span class="cf">Peripherals_Init</span>() == INIT_FAIL)
+        <span class="cf">System_EnterSafeMode</span>(ERR_PERIPHERAL);
+</span>
+    <span class="cc">/* UART is up — print debug banner */</span>
+    <span class="cf">Debug_Printf</span>(<span class="cs">"FW v%u.%u.%u | SYSCLK %lu Hz\r\n"</span>,
+                  FW_MAJOR, FW_MINOR, FW_PATCH, SystemCoreClock);
+
+    <span class="cc">/* ── Layer 6: Self-Test (POST) ───────────────────────────────── */</span>
+<span class="hl">    <span class="cf">Watchdog_Refresh</span>();
+    <span class="ck">if</span> (<span class="cf">POST_RunAll</span>() != POST_OK)
+        <span class="cf">System_EnterSafeMode</span>(ERR_POST);
+</span>
+    <span class="cc">/* ── Layer 7: Application Init ───────────────────────────────── */</span>
+<span class="hl">    <span class="cf">Watchdog_Refresh</span>();
+    <span class="cf">App_Init</span>();
+</span>
+    <span class="cc">/* ── Layer 8: Main Loop ──────────────────────────────────────── */</span>
+<span class="hl">    <span class="ck">while</span> (<span class="cn">1</span>) {
+        <span class="cf">Watchdog_Refresh</span>();              <span class="cc">/* ALWAYS first */</span>
+        <span class="cf">App_RunCycle</span>();
+        <span class="cf">Power_EnterSleep</span>();              <span class="cc">/* WFI — power saving */</span>
+    }
+</span>
+    <span class="cc">/* Should NEVER reach here */</span>
+    <span class="cf">ASSERT_NEVER_REACH</span>();
+    <span class="ck">return</span> <span class="cn">0</span>;
+}
+
+<span class="cc">/* ── Safe Mode — log, blink error LED, let WDG reset ─────────── */</span>
+<span class="ct">void</span> <span class="cf">System_EnterSafeMode</span>(<span class="ct">uint32_t</span> err) {
+    <span class="cf">NVM_Log_Error</span>(err);
+    <span class="cf">Debug_Printf</span>(<span class="cs">"[SAFE MODE] 0x%08lX\r\n"</span>, err);
+    <span class="ck">while</span> (<span class="cn">1</span>) {
+        <span class="cf">LED_Toggle</span>(LED_ERROR);
+        <span class="cf">Delay_ms</span>(<span class="cn">100</span>);
+        <span class="cc">/* Do NOT refresh WDG here — let it reset the system */</span>
+    }
+}</pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+  §12 — LAYER MAP
+══════════════════════════════════ -->
+<section class="sec" id="patterns">
+  <div class="sec-header"><span class="sec-num num-x">12</span><h2>Where Every Layer Lives</h2></div>
+  <p class="prose sr">One file per responsibility. No register writes in <code>main.c</code>. No application logic in driver files.</p>
+
+  <div class="layer-map sr">
+    <div class="lm-hdr"><span>File</span><span>What Goes Here</span><span>Scope</span></div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--txt-dim)">startup.s</div>
+      <div class="lm-content">Stack pointer, copy <code>.data</code>, zero <code>.bss</code>, call <code>SystemInit()</code>, jump to <code>main()</code>. Nothing else — ever.</div>
+      <div class="lm-scope" style="color:var(--txt-dim)">STARTUP</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--teal)">clock.c/h</div>
+      <div class="lm-content">HSI→HSE→PLL→SYSCLK. Flash wait states. Bus dividers. Timeout on every poll. Returns status code.</div>
+      <div class="lm-scope" style="color:var(--teal)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--red)">watchdog.c/h</div>
+      <div class="lm-content">IWDG configure, start, refresh. <code>Watchdog_WasReset()</code>. Called from main() immediately after clock.</div>
+      <div class="lm-scope" style="color:var(--red)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--amber)">power.c/h</div>
+      <div class="lm-content">Voltage scale, BOR level, Vref enable, VDD measurement and validation.</div>
+      <div class="lm-scope" style="color:var(--amber)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--blue)">gpio.c/h</div>
+      <div class="lm-content">All-analog first, then configure used pins. All pin assignments in <code>board_config.h</code> only.</div>
+      <div class="lm-scope" style="color:var(--blue)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--blue)">peripherals.c/h</div>
+      <div class="lm-content">SysTick→DMA→UART→SPI/I2C→ADC cal→NVIC priorities. Each call returns status. Fail = safe mode or warn.</div>
+      <div class="lm-scope" style="color:var(--blue)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--amber)">self_test.c/h</div>
+      <div class="lm-content">RAM March-C, Flash CRC32, sensor plausibility, voltage rails. Returns bitmask. WDG refreshed between tests.</div>
+      <div class="lm-scope" style="color:var(--amber)">DRIVER</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--purple)">app_init.c/h</div>
+      <div class="lm-content">NVM config load + validate, calibration apply, state machine init, RTOS tasks. Zero direct register access.</div>
+      <div class="lm-scope" style="color:var(--purple)">APP</div>
+    </div>
+    <div class="lm-row">
+      <div class="lm-file" style="color:var(--green)">main.c</div>
+      <div class="lm-content">Orchestrator only. One function call per layer. Return value checked every call. while(1) or RTOS scheduler. No register writes.</div>
+      <div class="lm-scope" style="color:var(--green)">MAIN</div>
+    </div>
+  </div>
+
+  <h3 class="sr">Two Critical Patterns — Memorize These</h3>
+
+  <div class="two-col sr">
+    <div class="mini" style="border-color:var(--red-b)">
+      <div class="mini-title"><span style="color:var(--red)">✗</span> Wrong — Infinite poll</div>
+      <div class="mini-body">
+        <code style="display:block;margin-top:0.5rem;padding:0.5rem;background:var(--bg);border-radius:4px;font-size:0.75rem;color:var(--txt-mid)">while (!HSE_Ready()) {} // ← if crystal fails → bricked forever</code>
+      </div>
+    </div>
+    <div class="mini" style="border-color:var(--green-b)">
+      <div class="mini-title"><span style="color:var(--green)">✓</span> Right — Always timeout</div>
+      <div class="mini-body">
+        <code style="display:block;margin-top:0.5rem;padding:0.5rem;background:var(--bg);border-radius:4px;font-size:0.75rem;color:var(--txt-mid)">if (Tick()-t > 100) return TIMEOUT; // ← safe</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col sr">
+    <div class="mini" style="border-color:var(--red-b)">
+      <div class="mini-title"><span style="color:var(--red)">✗</span> Wrong — void init</div>
+      <div class="mini-body">
+        <code style="display:block;margin-top:0.5rem;padding:0.5rem;background:var(--bg);border-radius:4px;font-size:0.75rem;color:var(--txt-mid)">void ADC_Init(void) {...} // ← rejected in code review</code>
+      </div>
+    </div>
+    <div class="mini" style="border-color:var(--green-b)">
+      <div class="mini-title"><span style="color:var(--green)">✓</span> Right — return status</div>
+      <div class="mini-body">
+        <code style="display:block;margin-top:0.5rem;padding:0.5rem;background:var(--bg);border-radius:4px;font-size:0.75rem;color:var(--txt-mid)">Init_Status_t ADC_Init(void) {...} // ← production</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+  §13 — CHECKLIST
+══════════════════════════════════ -->
+<section class="sec" id="checklist">
+  <div class="sec-header"><span class="sec-num num-8">13</span><h2>Final Checklist — Before You Ship</h2></div>
+
+  <ul class="checklist sr">
+    <li><span class="ch-n">01</span>Reset_Handler copies .data and zeros .bss using raw pointer loops — not <code>memcpy</code> / <code>memset</code></li>
+    <li><span class="ch-n">02</span>Flash wait states set <em>before</em> increasing clock frequency</li>
+    <li><span class="ch-n">03</span>Every oscillator/PLL wait has a timeout with a meaningful error return path</li>
+    <li><span class="ch-n">04</span>Clock init falls back to HSI and logs an error if HSE fails — never hangs</li>
+    <li><span class="ch-n">05</span>Watchdog started immediately after clock is stable — before GPIO or peripheral init</li>
+    <li><span class="ch-n">06</span>Watchdog reset flag checked and logged to NVM on every boot</li>
+    <li><span class="ch-n">07</span>BOR (Brown-Out Reset) configured — MCU resets automatically if VDD drops</li>
+    <li><span class="ch-n">08</span>All GPIO pins set to Analog Input <em>before</em> configuring functional pins</li>
+    <li><span class="ch-n">09</span>All GPIO pin assignments defined in one file (<code>board_config.h</code>) — never scattered</li>
+    <li><span class="ch-n">10</span>Every init function returns a status code — no <code>void</code> init functions in production</li>
+    <li><span class="ch-n">11</span>Peripherals initialized in dependency order: SysTick → DMA → UART → SPI/I2C → ADC</li>
+    <li><span class="ch-n">12</span>ADC self-calibration called immediately after <code>ADC_Init()</code></li>
+    <li><span class="ch-n">13</span>NVIC priorities configured before enabling any IRQ</li>
+    <li><span class="ch-n">14</span>POST runs RAM test, Flash CRC, sensor range, and voltage rails</li>
+    <li><span class="ch-n">15</span>NVM config read has CRC validity check — loads defaults if corrupted</li>
+    <li><span class="ch-n">16</span><code>Watchdog_Refresh()</code> is the first call in every main loop iteration</li>
+    <li><span class="ch-n">17</span><code>System_EnterSafeMode()</code> logs to NVM and does <strong>NOT</strong> refresh watchdog — lets WDG auto-reset</li>
+    <li><span class="ch-n">18</span><code>main()</code> never returns — <code>while(1)</code> or <code>vTaskStartScheduler()</code> as final statement</li>
+    <li><span class="ch-n">19</span>Firmware version defined in one place — printed in debug banner after UART init</li>
+    <li><span class="ch-n">20</span>No register writes inside <code>main.c</code> — only driver API calls</li>
+  </ul>
+</section>
+
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<footer class="footer sr">
+  <p>// Embedded Startup — Complete Production Guide · C · Cortex-M</p>
+  <span class="footer-tag">v2.0 · Production Ready</span>
+</footer>
+
+</main>
+</div><!-- /layout -->
+</div><!-- /page -->
+
+<script>
+/* Toggle expand/collapse */
+function toggle(card) {
+  card.classList.toggle('open');
+}
+
+/* Scroll reveal */
+const revealIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.05 });
+document.querySelectorAll('.sr').forEach(el => revealIO.observe(el));
+
+/* Active nav link */
+const secs = document.querySelectorAll('section.sec[id]');
+const navItems = document.querySelectorAll('.nav-item[href]');
+const navIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navItems.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+secs.forEach(s => navIO.observe(s));
+
+/* sec-header underline width animation on enter */
+const hdrs = document.querySelectorAll('.sec-header');
+const hdrIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.setProperty('--uw','80px');
+    }
+  });
+}, {threshold: 0.5});
+hdrs.forEach(h => {
+  h.style.setProperty('--uw','0px');
+  h.style.cssText += ';';
+  hdrIO.observe(h);
+});
+</script>
+</body>
+</html>
